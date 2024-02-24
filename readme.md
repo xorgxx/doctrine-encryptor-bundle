@@ -16,9 +16,9 @@ Protection Regulation (GDPR).
 Install the bundle for Composer !! as is still on a beta version !!
 
 ````
-  composer require xorgxx/neox-encryptor-bundle
+  composer require xorgxx/doctrine-encryptor-bundle
   or 
-  composer require xorgxx/neox-encryptor-bundle:0.* or dev-master
+  composer require xorgxx/doctrine-encryptor-bundle:0.* or dev-master
 ````
 🚨 Add in your project this bundles. 🚨
 ````
