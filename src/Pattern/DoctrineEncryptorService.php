@@ -73,7 +73,7 @@
                 }
                 
                 if ($Reflection->getAttributeProperty() === "out" &&
-                    ($event === "postPersist" || $event === "preUpdate") &&
+                    ($event === "postPersist" || $event === "preUpdate" || $event === "convert") &&
                     $this->force === false
                 ) {
                     $neoxEncryptor  = $this->encryptor->getEncryptorId($entity);
@@ -82,7 +82,6 @@
                     // preUpdate source entity will be encrypted
                     $Reflection->getProperty()->setValue($entity, $process_);
                     $items[$Reflection->getPropertyName()] = $process;
-                    
                 }
             }
             if ($items) {
@@ -99,14 +98,18 @@
          */
         public function decrypt($entity, string $event, bool $force = false): void
         {
+            /** @var entityAttribute $Reflection */
             $Reflections    = $this->getReflection($entity);
             $neoxEncryptor  = $this->encryptor->getEncryptorId($entity);
             
             foreach ($Reflections[$entity::class] as $Reflection) {
+                // process the value Encrypt/decrypt
+                $process = $this->encryptor->decrypt($Reflection->getValue());
+                
                 if ($Reflection->getAttributeProperty() === "in") {
                     // process the value Encrypt/decrypt
                     $process = $this->encryptor->decrypt($Reflection->getValue());
-                    $Reflection->getProperty()->setValue($entity, $process);
+                   
                 }
                 
                 if ($Reflection->getAttributeProperty() === "out" && $neoxEncryptor->getId()) {
@@ -114,8 +117,12 @@
                     $value          = json_decode($neoxEncryptor->getContent(), false, 512, JSON_THROW_ON_ERROR)->$propertyName;
                     // process the value Encrypt/decrypt
                     $process        = $this->encryptor->decrypt($value);
-                    $Reflection->getProperty()->setValue($entity, $process);
-                }
+//                    $o = $Reflection->getProperty();
+//                    $o->setValue($entity, $process);
+//                    $m= null;
+                } 
+                $Reflection->getProperty()->setValue($entity, $process);
+                $m = null;
             }
             
             ++$this->neoxStats["Decrypt"];
@@ -145,10 +152,11 @@
                  * THIS should affect only this instance of DoctrineEncryptor
                  **/
                 $this->neoxDoctrineTools->EventListenerPostFlush();
-                $this->neoxDoctrineTools->EventListenerOnFlush();
+                $this->neoxDoctrineTools->EventListenerPostUpdate();
                 
                 foreach ($Entity as $item) {
                     if ($action === "Decrypt") {
+//                        $this->decrypt($item, "convert", false);
                         // check if property is encrypted in NeoxEncryptor if yes delete
                         if ($neoxEncryptor = $this->encryptor->getEncryptorId($item)) {
                             $this->encryptor->entityManager->remove($neoxEncryptor);
@@ -164,7 +172,7 @@
                 
                 // Important : restart the listeners !!
                 $this->neoxDoctrineTools->EventListenerOnFlush(true);
-                $this->neoxDoctrineTools->EventListenerPostFlush(true);
+                $this->neoxDoctrineTools->EventListenerPostUpdate(true);
             }
         }
         

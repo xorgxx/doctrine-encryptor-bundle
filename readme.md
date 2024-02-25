@@ -83,7 +83,7 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
   
 ````
 **Now** you can start command (CLI) to encrypt/decrypt entity ... 
-  * **!!! we just made refactoring and command may not work !!!**
+
   * php bin/console neox:encryptor:wasaaaa
 
 

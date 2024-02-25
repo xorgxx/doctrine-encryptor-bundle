@@ -34,6 +34,16 @@
             }
         }
         
+        public  function EventListenerPostUpdate(bool $stat = false): void
+        {
+            if ($stat) {
+                $this->eventManager->addEventListener([Events::postUpdate], DoctrineEncryptorSubscriber::class);
+            }else{
+                $this->eventManager->removeEventListener([Events::postUpdate], DoctrineEncryptorSubscriber::class);
+            }
+        }
+        
+        
         public  function EventListenerPostFlush(bool $stat = false): void
         {
             if ($stat) {
