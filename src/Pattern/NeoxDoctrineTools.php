@@ -18,38 +18,36 @@
         
         public  function EventListenerPostLoad(bool $stat = false): void
         {
-            if ($stat) {
-                $this->eventManager->addEventListener([Events::postLoad], DoctrineEncryptorSubscriber::class);
-            }else{
-                $this->eventManager->removeEventListener([Events::postLoad], DoctrineEncryptorSubscriber::class);
-            }
+            $method = $this->getAction($stat);
+            $this->eventManager->$method([Events::postLoad], DoctrineEncryptorSubscriber::class);
         }
         
-        public  function EventListenerOnFlush(bool $stat = false): void
+        public function EventListenerOnFlush(bool $stat = false): void
         {
-            if ($stat) {
-                $this->eventManager->addEventListener([Events::onFlush], DoctrineEncryptorSubscriber::class);
-            }else{
-                $this->eventManager->removeEventListener([Events::onFlush], DoctrineEncryptorSubscriber::class);
-            }
+            $method = $this->getAction($stat);
+            $this->eventManager->$method([Events::onFlush], DoctrineEncryptorSubscriber::class);
         }
         
         public  function EventListenerPostUpdate(bool $stat = false): void
         {
-            if ($stat) {
-                $this->eventManager->addEventListener([Events::postUpdate], DoctrineEncryptorSubscriber::class);
-            }else{
-                $this->eventManager->removeEventListener([Events::postUpdate], DoctrineEncryptorSubscriber::class);
-            }
+            $method = $this->getAction($stat);
+            $this->eventManager->$method([Events::postUpdate], DoctrineEncryptorSubscriber::class);
         }
         
         
         public  function EventListenerPostFlush(bool $stat = false): void
         {
-            if ($stat) {
-                $this->eventManager->addEventListener([Events::postFlush], DoctrineEncryptorSubscriber::class);
-            }else{
-                $this->eventManager->removeEventListener([Events::postFlush], DoctrineEncryptorSubscriber::class);
-            }
+            $method = $this->getAction($stat);
+            $this->eventManager->$method([Events::postFlush], DoctrineEncryptorSubscriber::class);
+        }
+        
+        /**
+         * @param bool $stat
+         *
+         * @return string
+         */
+        public function getAction(bool $status): string
+        {
+            return $status ? 'addEventListener' : 'removeEventListener';
         }
     }
