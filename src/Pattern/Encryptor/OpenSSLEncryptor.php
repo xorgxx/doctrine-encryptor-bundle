@@ -1,4 +1,7 @@
 <?php
+    /********************** OpenSSLEncryptor.php ***********************************************
+    * CODE EXPERIMENTAL - DO NOT USE IN PRODUCTION
+    *******************************************************************************************/
     
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\Encryptor;
 
@@ -7,99 +10,121 @@
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\EncryptorInterface;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\NeoxDoctrineTools;
     use ParagonIE\Halite\Alerts\CannotPerformOperation;
-    use ParagonIE\Halite\Alerts\InvalidDigestLength;
     use ParagonIE\Halite\Alerts\InvalidKey;
-    use ParagonIE\Halite\Alerts\InvalidMessage;
     use ParagonIE\Halite\Alerts\InvalidSalt;
-    use ParagonIE\Halite\Alerts\InvalidSignature;
     use ParagonIE\Halite\Alerts\InvalidType;
-    use ParagonIE\Halite\Halite;
     use ParagonIE\Halite\KeyFactory;
-    use ParagonIE\Halite\Symmetric\Crypto;
     use ParagonIE\Halite\Util;
     use ParagonIE\HiddenString\HiddenString;
     use SodiumException;
     use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
     
-    
     class OpenSSLEncryptor implements EncryptorInterface
     {
+        private const HASH_ALGORITHM = 'sha256';
         
-        public function __construct(private readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools)
+        private $secretKey;
+        private $cipherAlgorithm;
+        private $base64;
+        private $formatBase64Output;
+        private $randomPseudoBytes;
+        private $iv;
+        private $ivLength;
+        
+        public function __construct(readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools)
         {
         }
+
         
         /**
-         * @throws InvalidType
-         * @throws InvalidSignature
-         * @throws InvalidDigestLength
-         * @throws SodiumException
-         * @throws InvalidSalt
-         * @throws InvalidKey
-         * @throws InvalidMessage
-         * @throws CannotPerformOperation
+         * @param string $secretIv
          */
-        public function encrypt($field): string
+        public function buildSecretIv(string $secretIv): void
         {
-            $Halite = Halite::VERSION_PREFIX;
-            // if it is already Encrypted then Decrypted
-            if (!preg_match("/^{$Halite}/", $field)) {
-                [$encryptionKey, $message] = $this->getEncryptionKey($field);
-                return Crypto::encrypt($message, $encryptionKey);
-            }
-            return $field;
-        }
-        
-        /**
-         * @throws InvalidType
-         * @throws InvalidSignature
-         * @throws InvalidDigestLength
-         * @throws SodiumException
-         * @throws InvalidSalt
-         * @throws InvalidKey
-         * @throws InvalidMessage
-         * @throws CannotPerformOperation
-         */
-        public function decrypt($field): string
-        {
-            $Halite = Halite::VERSION_PREFIX;
+            $ivLength   = openssl_cipher_iv_length($this->cipherAlgorithm);
+            $secretIv   = $this->randomPseudoBytes ? openssl_random_pseudo_bytes($ivLength) : $secretIv;
+            $key        = hash_hmac(self::HASH_ALGORITHM, $secretIv, $this->secretKey, true);
+            $this->iv   = substr($key, 0, $ivLength);
             
-            // if it is already Encrypted then Decrypted
-            if (preg_match("/^{$Halite}/", $field)) {
-                [$encryptionKey, $message] = $this->getEncryptionKey($field);
-                return Crypto::decrypt($message->getString(), $encryptionKey)->getString();
-            }
-            return $field;
         }
         
         /**
-         * @throws InvalidType
-         * @throws InvalidKey
-         * @throws SodiumException
-         * @throws InvalidSalt
+         * @param string $plainText
+         *
+         * @return string
+         */
+        public function encrypt($plainText): string
+        {
+            $encrypted      = openssl_encrypt($plainText, $this->cipherAlgorithm, $this->secretKey, OPENSSL_RAW_DATA, $this->iv);
+            $encrypted      = $this->iv . $encrypted;
+            
+            return $this->base64 ? $this->base64Encode($encrypted) : $encrypted;
+        }
+        
+        /**
+         * @param $plainText
+         *
+         * @return string
+         */
+        public function decrypt($plainText): string
+        {
+            $iv         = substr($plainText, 0, $this->ivLength);
+            $raw        = substr($plainText, $this->ivLength);
+            $decrypted  = openssl_decrypt($raw, $this->cipherAlgorithm, $this->secretKey, OPENSSL_RAW_DATA, $iv);
+            
+            if ($decrypted === false) {
+                // Error !!
+                throw new \RuntimeException('Erreur lors du déchiffrement.');
+            }
+            return trim($decrypted);
+        }
+        
+        /**
+         * @param string $data
+         *
+         * @return string
+         */
+        private function base64Encode(string $data): string
+        {
+            return $this->formatBase64Output ?
+                rtrim(strtr(base64_encode($data), '+/', '-_'), '=') :
+                base64_encode($data);
+        }
+        
+        /**
+         * @param string $data
+         *
+         * @return string
+         */
+        private function base64Decode(string $data): string
+        {
+            return $this->formatBase64Output ?
+                base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT), true) :
+                base64_decode($data, true);
+        }
+        
+        /**
+         * @param string $msg
+         *
+         * @return array
          */
         public function getEncryptionKey(string $msg = ""): array
         {
-            $key            = new HiddenString($this->parameterBag->get("doctrine_encryptor.encryptor_pws"));
-            $message        = new HiddenString($msg);
-            $encryptionKey  = KeyFactory::deriveEncryptionKey($key, $this->getSalt());
-            
-            return [$encryptionKey, $message];
-        }
-        
-        private function getSalt(): \UnitEnum|float|array|bool|int|string|null
-        {
-            return $this->parameterBag->get('doctrine_encryptor.encryptor_salt');
+            // TODO: Implement getEncryptionKey() method.
         }
         
         /**
-         * @throws InvalidType
-         * @throws InvalidKey
-         * @throws CannotPerformOperation
-         * @throws InvalidSalt
-         * @throws SodiumException
+         * @param $entity
+         *
+         *  @throws InvalidType
+         *  @throws InvalidKey
+         *  @throws CannotPerformOperation
+         *  @throws InvalidSalt
+         *  @throws SodiumException
+         *
+         * @return NeoxEncryptor|null
          */
-        public function getEncryptorId( $entity ): ?NeoxEncryptor
+        public function getEncryptorId($entity): ?NeoxEncryptor
         {
             // ff5d400f96d533dfda3018dc7dce45f5
             $salt                   = $this->getSalt();
@@ -121,15 +146,5 @@
             };
             
             return $encryptor;
-        }
-        
-        public function setNeoxEncryptor(?NeoxEncryptor $encryptor): void
-        {
-            $this->entityManager->persist($encryptor);
-            $this->neoxDoctrineTools->EventListenerOnFlush();
-//            $this->neoxDoctrineTools->EventListenerPostFlush();
-            $this->entityManager->flush();
-            $this->neoxDoctrineTools->EventListenerOnFlush(true);
-//            $this->neoxDoctrineTools->EventListenerPostFlush(true);
         }
     }
