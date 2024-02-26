@@ -31,14 +31,18 @@
         {
         }
         
-        public function preUpdate(PreUpdateEventArgs $args)
+        public function preUpdate(PreUpdateEventArgs $args): void
         {
             //.....
         }
         
-        public function postUpdate(PostUpdateEventArgs $args)
+        /**
+         * @throws ReflectionException
+         * @throws JsonException
+         */
+        public function postUpdate(PostUpdateEventArgs $args): void
         {
-            $entity = $args->getEntity();
+            $entity = $args->getObject();
             
             if (DoctrineEncryptorService::isSupport(get_class($entity))) {
                 // Perform encryption
@@ -47,9 +51,14 @@
         }
         
         // Iterate over the scheduled entity insertions (NEW)
-        public function prePersist(PrePersistEventArgs $args)
+        
+        /**
+         * @throws ReflectionException
+         * @throws JsonException
+         */
+        public function prePersist(PrePersistEventArgs $args): void
         {
-            $entity = $args->getEntity();
+            $entity = $args->getObject();
             
             if (DoctrineEncryptorService::isSupport(get_class($entity))) {
                 // Perform encryption
@@ -58,9 +67,14 @@
         }
         
         // Iterate over the scheduled entity insertions (NEW)
-        public function postPersist(PostPersistEventArgs $args)
+        
+        /**
+         * @throws ReflectionException
+         * @throws JsonException
+         */
+        public function postPersist(PostPersistEventArgs $args): void
         {
-            $entity = $args->getEntity();
+            $entity = $args->getObject();
 
             if (DoctrineEncryptorService::isSupport(get_class($entity))) {
                 // Perform encryption
