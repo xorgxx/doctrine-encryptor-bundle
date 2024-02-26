@@ -73,7 +73,7 @@
                 // get the value of the property
                 if ($Reflection->getAttributeProperty() === "in") {
                     // set the value of the property with the processed value in entity
-                    $Reflection->getProperty()->setValue($entity, $process);
+//                    $Reflection->getProperty()->setValue($entity, $process);
                 }
                 
                 if ($Reflection->getAttributeProperty() === "out" &&
@@ -81,12 +81,11 @@
                     $this->force === false
                 ) {
                     $neoxEncryptor  = $this->encryptor->getEncryptorId($entity);
-                    $process_       = self::callBackType($Reflection->getType());
-                    
-                    // preUpdate source entity will be encrypted
-                    $Reflection->getProperty()->setValue($entity, $process_);
                     $items[$Reflection->getPropertyName()] = $process;
+                    $process        = self::callBackType($Reflection->getType());
                 }
+                // preUpdate source entity will be encrypted
+                $Reflection->getProperty()->setValue($entity, $process);
             }
             if ($items) {
                 $neoxEncryptor?->setContent(json_encode($items, JSON_THROW_ON_ERROR | false, 512));
