@@ -119,17 +119,18 @@ Occasionally, we may require access to a full range of data (4000 lines or more)
 
 ## Contributing
 If you want to contribute \(thank you!\) to this bundle, here are some guidelines:
-* ### I'm not an expert in Pest/PHPUnit testing, so I haven't been able to complete the tests. If anyone can offer assistance, please reach out to me. Thank you!
+* ## I'm not an expert in Pest/PHPUnit testing, so I haven't been able to complete the tests. If anyone can offer assistance, please reach out to me. Thank you!
 * Please respect the [Symfony guidelines](http://symfony.com/doc/current/contributing/code/standards.html)
 * Test everything! Please add tests cases to the tests/ directory when:
     * You fix a bug that wasn't covered before
     * You add a new feature
     * You see code that works but isn't covered by any tests \(there is a special place in heaven for you\)
 ## Todo
-~~* Add a Remote system for storage Hash => Key~~
-~~* to be able to encrypt/decrypt, according to a propriety type | int, string, phone ....~~
-* Custom provider class Encrypt/decrypt.
-* Dispatcher to custom code.
-* Command wasaaaa : to manage more easily status, encrypt, decrypt ....
+* Testing App !! Need help for this.
+* ~~Add a Remote system for storage Hash => Key~~
+* ~~to be able to encrypt/decrypt, according to a propriety type | int, string, phone ....~~
+* ~~Custom provider class Encrypt/decrypt.~~
+* ~~Dispatcher to custom code.~~
+* ~~Command wasaaaa : to manage more easily status, encrypt, decrypt ....~~
 
 ## Thanks
