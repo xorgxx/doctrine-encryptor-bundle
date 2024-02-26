@@ -119,7 +119,7 @@ Occasionally, we may require access to a full range of data (4000 lines or more)
 
 ## Contributing
 If you want to contribute \(thank you!\) to this bundle, here are some guidelines:
-
+* ### I'm not an expert in Pest/PHPUnit testing, so I haven't been able to complete the tests. If anyone can offer assistance, please reach out to me. Thank you!
 * Please respect the [Symfony guidelines](http://symfony.com/doc/current/contributing/code/standards.html)
 * Test everything! Please add tests cases to the tests/ directory when:
     * You fix a bug that wasn't covered before
