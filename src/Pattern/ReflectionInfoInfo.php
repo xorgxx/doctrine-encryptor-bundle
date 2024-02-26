@@ -4,7 +4,7 @@
     
     use ReflectionProperty;
     
-    class Reflection
+    class ReflectionInfo
     {
         private string $type;
         private string $propertyName;
@@ -18,7 +18,7 @@
             return $this->type;
         }
         
-        public function setType(string $type): Reflection
+        public function setType(string $type): ReflectionInfo
         {
             $this->type = $type;
             return $this;
@@ -29,7 +29,7 @@
             return $this->propertyName;
         }
         
-        public function setPropertyName(string $propertyName): Reflection
+        public function setPropertyName(string $propertyName): ReflectionInfo
         {
             $this->propertyName = $propertyName;
             return $this;
@@ -40,7 +40,7 @@
             return $this->value;
         }
         
-        public function setValue(\UnitEnum|float|int|bool|array|string|null $value): Reflection
+        public function setValue(\UnitEnum|float|int|bool|array|string|null $value): ReflectionInfo
         {
             $this->value = $value;
             return $this;
@@ -51,7 +51,7 @@
             return $this->property;
         }
         
-        public function setProperty(ReflectionProperty $property): Reflection
+        public function setProperty(ReflectionProperty $property): ReflectionInfo
         {
             $this->property = $property;
             return $this;
@@ -62,7 +62,7 @@
             return $this->attributeProperty;
         }
         
-        public function setAttributeProperty(string $attributeProperty): Reflection
+        public function setAttributeProperty(string $attributeProperty): ReflectionInfo
         {
             $this->attributeProperty = $attributeProperty;
             return $this;

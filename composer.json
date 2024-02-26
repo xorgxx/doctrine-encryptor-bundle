@@ -25,14 +25,18 @@
     "symfony/property-access": "^6.3|^7.0"
   },
   "require-dev": {
+    "pestphp/pest": "^1.23",
+    "phpunit/phpunit": "^9.5",
     "symfony/phpunit-bridge": "^6.3|^7.0",
-    "symfony/security-core": "^6.3|^7.0"
+    "symfony/security-core": "^6.3|^7.0",
+    "symfony/test-pack": "^1.1"
   },
   "config": {
     "preferred-install": "dist",
     "sort-packages": true,
     "allow-plugins": {
-      "symfony/flex": false
+      "symfony/flex": false,
+      "pestphp/pest-plugin": true
     }
   },
   "conflict": {

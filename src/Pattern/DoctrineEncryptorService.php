@@ -29,7 +29,11 @@
         public static function isSupport(string $className): bool
         {
             $filename = (new ReflectionClass($className))->getFileName();
-            return str_contains(file_get_contents($filename), neoxEncryptor::class);
+            $fileContent = file_get_contents($filename);
+            
+            // Search for neoxEncryptor in file contents, ignoring comments
+            $cleanContent = preg_replace('/\/\*.*?\*\/|\/\/.*?[\r\n]/s', '', $fileContent);
+            return str_contains($cleanContent, neoxEncryptor::class);
         }
         
         public static function callBackType(string $type, mixed $mode = false)
@@ -177,7 +181,10 @@
         }
         
         
-        private function getReflection($entity): array
+        /**
+         * @throws ReflectionException
+         */
+        public function getReflection($entity): array
         {
             
             $r[$entity::class] = [];
@@ -185,7 +192,7 @@
             $reflectorName = new ReflectionClass($entity);
             foreach ($reflectorName->getProperties() as $property) {
                 
-                $object = new Reflection();
+                $object = new ReflectionInfo();
                 $object->setProperty($property);
                 
                 // filter on "neoxEncryptor" attribute
@@ -206,7 +213,7 @@
         }
         
         
-        private function getEncryptor(): void
+        public function getEncryptor(): void
         {
             $this->encryptor = $this->neoxDoctrineFactory->buildEncryptor();
         }

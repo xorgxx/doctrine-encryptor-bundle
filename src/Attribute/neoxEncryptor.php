@@ -9,7 +9,7 @@
      * The `neoxEncryptor` class is a PHP attribute that can be applied to properties and is used as a
      * placeholder for encryption functionality.
      */
-    #[Attribute(Attribute::TARGET_PROPERTY )]
+    #[Attribute(Attribute::TARGET_PROPERTY | Attribute::TARGET_CLASS )]
     class neoxEncryptor implements MappingAttribute
     {
         /**

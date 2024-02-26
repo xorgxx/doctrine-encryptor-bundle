@@ -2,6 +2,18 @@
 
 /*
 |--------------------------------------------------------------------------
+| Uses
+|--------------------------------------------------------------------------
+|
+| Here you may define the classes or traits that should be used by your tests.
+|
+ */
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+uses(WebTestCase::class)->in('Controller');
+
+/*
+|--------------------------------------------------------------------------
 | Test Case
 |--------------------------------------------------------------------------
 |
@@ -10,8 +22,6 @@
 | need to change it using the "uses()" function to bind a different classes or traits.
 |
 */
-
-// uses(Tests\TestCase::class)->in('Feature');
 
 /*
 |--------------------------------------------------------------------------
@@ -24,8 +34,14 @@
 |
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
+expect()->extend(name: 'toBeOne', extend: function () {
+    return $this->toBe(expected: 1);
+});
+
+
+expect()->extend(name: 'toMatchJson', extend: function (array $expected) {
+    $this->value = json_decode($this->value, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
+    return $this->toMatchArray($expected);
 });
 
 /*
