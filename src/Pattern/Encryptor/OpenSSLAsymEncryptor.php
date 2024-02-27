@@ -10,14 +10,6 @@
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\EncryptorInterface;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\NeoxDoctrineTools;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLTools;
-    use ParagonIE\Halite\Alerts\CannotPerformOperation;
-    use ParagonIE\Halite\Alerts\InvalidKey;
-    use ParagonIE\Halite\Alerts\InvalidSalt;
-    use ParagonIE\Halite\Alerts\InvalidType;
-    use ParagonIE\Halite\KeyFactory;
-    use ParagonIE\Halite\Util;
-    use ParagonIE\HiddenString\HiddenString;
-    use SodiumException;
     use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
     
     class OpenSSLAsymEncryptor implements EncryptorInterface
@@ -36,6 +28,7 @@
          * @param string $plainText
          *
          * @return string
+         * @throws \Exception
          */
         public function encrypt($plainText): string
         {
@@ -52,6 +45,7 @@
          * @param $plainText
          *
          * @return string
+         * @throws \Exception
          */
         public function decrypt($plainText): string
         {
@@ -72,6 +66,7 @@
          * @param string $msg
          *
          * @return array
+         * @throws \Exception
          */
         public function getEncryptionKey(string $msg = ""): array
         {

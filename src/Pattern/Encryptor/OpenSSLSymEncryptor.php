@@ -10,28 +10,12 @@
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\EncryptorInterface;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\NeoxDoctrineTools;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLTools;
-    use ParagonIE\Halite\Alerts\CannotPerformOperation;
-    use ParagonIE\Halite\Alerts\InvalidKey;
-    use ParagonIE\Halite\Alerts\InvalidSalt;
-    use ParagonIE\Halite\Alerts\InvalidType;
-    use ParagonIE\Halite\KeyFactory;
-    use ParagonIE\Halite\Util;
-    use ParagonIE\HiddenString\HiddenString;
-    use SodiumException;
     use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
     
     class OpenSSLSymEncryptor implements EncryptorInterface
     {
-        private const HASH_ALGORITHM = 'whirlpool';
-        
-        private $secretKey;
-        private $cipherAlgorithm = 'ChaCha20';  // aes-256-cbc
-        private $base64;
-        private $formatBase64Output;
-        private $randomPseudoBytes;
-        private $iv;
-        private $ivLength;
-        
+        private string $cipherAlgorithm = 'ChaCha20';  // aes-256-cbc
+
         public function __construct(readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools)
         {
         }

@@ -3,6 +3,7 @@
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL;
     
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\DoctrineEncryptorService;
+    use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
     
     class OpenSSLTools
     {
@@ -88,39 +89,22 @@
         {
             $directory   = dirname(__DIR__, 6). self::PATH_FOLDER;
             
-            if (!file_exists($directory)) {
-                mkdir($directory, 0777, true);
+            if (!is_dir($directory)) {
+                if (!mkdir($directory, 0777, true) && !is_dir($directory)) {
+                    throw new \RuntimeException(sprintf('Directory "%s" was not created', $directory));
+                }
             }
             
             return $directory;
         }
         
-        public static function isCrypted($string): bool 
+        public static function isBase64($string): bool
         {
-            if (DoctrineEncryptorService::callBackType($string, true)) {
-                return true;
-            }
-            return strpos($string, SELF::PREFIX) === 0 ? true : false ;
-        }
-        
-        public static function isDecrypted($string): bool
-        {
-            if (DoctrineEncryptorService::callBackType($string, true)) {
-                return false;
-            }
-            return strpos($string, "TkVPW") === 0 ? true : false ;
-        }
-        
-        public static function isBase64($string) {
             if (DoctrineEncryptorService::callBackType($string, true)) {
                 return false;
             }
             $decodedString = base64_decode($string, true);
             // Vérifie si le décodage a réussi et que la chaîne décodée est identique à la chaîne d'origine
-            if ($decodedString !== false && base64_encode($decodedString) === $string ) {
-                return true; // La chaîne est encodée en Base64
-            } else {
-                return false; // La chaîne n'est pas encodée en Base64
-            }
+            return $decodedString !== false && base64_encode($decodedString) === $string; // La chaîne n'est pas encodée en Base64
         }
     }
