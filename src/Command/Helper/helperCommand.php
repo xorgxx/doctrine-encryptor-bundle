@@ -5,6 +5,8 @@
     use Doctrine\Persistence\ManagerRegistry;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\neoxEncryptor;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\DoctrineEncryptorService;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLAlgo;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLTools;
     use JsonException;
     use ReflectionException;
     
@@ -15,7 +17,6 @@
         
         public function __construct(readonly ManagerRegistry $doctrine, readonly DoctrineEncryptorService $doctrineEncryptorService)
         {}
-        
         
         /**
          * @throws ReflectionException
