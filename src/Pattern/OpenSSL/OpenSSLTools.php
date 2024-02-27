@@ -2,11 +2,15 @@
     
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL;
     
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\DoctrineEncryptorService;
+    
     class OpenSSLTools
     {
         const PRIVATE_KEY   = 'doctrine_encryptor_private.pem';
         const PUBLIC_KEY    = 'doctrine_encryptor_public.pem';
         const PATH_FOLDER   = '/config/OpenSSL/';
+        const PREFIX        = 'NEOX';
+        
         public function __construct(readonly ParameterBagInterface $parameterBag)
         {
         }
@@ -89,5 +93,34 @@
             }
             
             return $directory;
+        }
+        
+        public static function isCrypted($string): bool 
+        {
+            if (DoctrineEncryptorService::callBackType($string, true)) {
+                return true;
+            }
+            return strpos($string, SELF::PREFIX) === 0 ? true : false ;
+        }
+        
+        public static function isDecrypted($string): bool
+        {
+            if (DoctrineEncryptorService::callBackType($string, true)) {
+                return false;
+            }
+            return strpos($string, "TkVPW") === 0 ? true : false ;
+        }
+        
+        public static function isBase64($string) {
+            if (DoctrineEncryptorService::callBackType($string, true)) {
+                return false;
+            }
+            $decodedString = base64_decode($string, true);
+            // Vérifie si le décodage a réussi et que la chaîne décodée est identique à la chaîne d'origine
+            if ($decodedString !== false && base64_encode($decodedString) === $string ) {
+                return true; // La chaîne est encodée en Base64
+            } else {
+                return false; // La chaîne n'est pas encodée en Base64
+            }
         }
     }

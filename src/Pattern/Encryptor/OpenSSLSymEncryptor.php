@@ -43,11 +43,11 @@
          */
         public function encrypt($plainText): string
         {
-            if (!$this->isBase64($plainText)) {
+//            if (OpenSSLTools::isBase64($plainText)) {
                 $secret         = $this->getEncryptionKey();
                 $cipherText     = openssl_encrypt($plainText, $this->cipherAlgorithm, $secret['pws'], OPENSSL_RAW_DATA, $secret['iv']);
                 $plainText      = base64_Encode($cipherText);
-            }
+//            }
             return $plainText;
         }
         
@@ -58,37 +58,13 @@
          */
         public function decrypt($plainText): string
         {
-            if ($this->isBase64($plainText)) {
+            if (OpenSSLTools::isBase64($plainText)) {
                 $secret     = $this->getEncryptionKey();
                 $cipherText = base64_decode($plainText);
                 $plainText  = openssl_decrypt($cipherText, $this->cipherAlgorithm, $secret['pws'], OPENSSL_RAW_DATA, $secret['iv']);
             }
         
             return $plainText;
-        }
-        
-        /**
-         * @param string $data
-         *
-         * @return string
-         */
-        private function base64Encode(string $data): string
-        {
-            return $this->formatBase64Output ?
-                rtrim(strtr(base64_encode($data), '+/', '-_'), '=') :
-                base64_encode($data);
-        }
-        
-        /**
-         * @param string $data
-         *
-         * @return string
-         */
-        private function base64Decode(string $data): string
-        {
-            return $this->formatBase64Output ?
-                base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT), true) :
-                base64_decode($data, true);
         }
         
         /**
@@ -121,17 +97,5 @@
             };
             
             return $encryptor;
-        }
-        
-        private function isBase64($string) {
-            // Décode la chaîne en Base64
-            $decodedString = base64_decode($string, true);
-            
-            // Vérifie si le décodage a réussi et que la chaîne décodée est identique à la chaîne d'origine
-            if ($decodedString !== false && base64_encode($decodedString) === $string) {
-                return true; // La chaîne est encodée en Base64
-            } else {
-                return false; // La chaîne n'est pas encodée en Base64
-            }
         }
     }

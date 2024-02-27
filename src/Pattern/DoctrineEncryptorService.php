@@ -54,7 +54,7 @@
                                "Array"   => ["007" => "007"]],
             ];
             
-            return ($mode && in_array($mode, $msg, true)) ? true : ($msg[$type] ?? null);
+            return ($mode && in_array($type, $msg, true)) ? true : ($msg[$type] ?? null);
         }
         
         /**

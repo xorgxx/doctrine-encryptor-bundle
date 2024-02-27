@@ -39,20 +39,13 @@
          */
         public function encrypt($plainText): string
         {
-            $KEYS   = $this->getEncryptionKey();
+//            if ( !OpenSSLTools::isCrypted($plainText) ) {
+                $secret         = $this->getEncryptionKey();
+                $cipherText     = openssl_public_encrypt($plainText, $encryptedMessage, $secret["publicKey"]);
+                $plainText      = base64_Encode($encryptedMessage);
+//            }
+            return $plainText;
 
-            try {
-                // Encrypt plain text
-                if (!openssl_private_encrypt($plainText, $encryptedMessage, $KEYS["privateKey"])) {
-                    throw new \Exception('Encryption failed.');
-                }
-                
-                // Return base64 encoded ciphertext
-                return base64_encode($encryptedMessage);
-            } catch (\Exception $e) {
-                // Error
-                throw new \Exception('Error during encryption: ' . $e->getMessage() . "\n\n" . openssl_error_string() . "\n\n");
-            }
         }
         
         /**
@@ -62,9 +55,17 @@
          */
         public function decrypt($plainText): string
         {
-            $KEYS   = $this->getEncryptionKey();
-            openssl_private_decrypt($plainText, $decryptedMessage, $KEYS["privateKey"]);
-            return $decryptedMessage ?? $plainText;
+            if ( OpenSSLTools::isBase64( $plainText ) && $plainText !== '') {
+                $secret     = $this->getEncryptionKey();
+                $cipherText = base64_decode($plainText);
+                openssl_private_decrypt($cipherText, $decryptedMessage, $secret["privateKey"]);
+                $plainText  = $decryptedMessage ?? $plainText;
+            }
+            return $plainText;
+            
+//            $KEYS   = $this->getEncryptionKey();
+//            openssl_private_decrypt($plainText, $decryptedMessage, $KEYS["privateKey"]);
+//            return $decryptedMessage ?? $plainText;
         }
         
         /**
