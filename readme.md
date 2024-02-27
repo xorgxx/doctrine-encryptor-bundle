@@ -24,30 +24,26 @@ Install the bundle for Composer !! as is still on a beta version !!
 ````
   composer require paragonie/halite
 ````
-.env file
-````
-  ....
-  NEOX_ENCRY_SALT="**@#$#*#&%&@$&^@"    # 16 bit
-  NEOX_ENCRY_PWS="03~é][a6{1;a7a^e2d"   # password your want (more long, more secure, more time to process)
-  ....
-````
+
 doctrine_encryptor.yaml file
 ````
   doctrine_encryptor:
     # (default)false or true | it will turn off the bundle. by aware that it will render nothing !! field on front will by empty!!
     # this is only for testing purpose in Development mode !!!
     nencryptor_off: false
-    encryptor_pws: "%env(NEOX_ENCRY_PWS)%"
-    encryptor_salt: "%env(NEOX_ENCRY_SALT)%"
-    encryptor_system: halite # halite or | openssl -> future
+    encryptor_system: halite # halite (default) or | openSSLAsym | openSSLSym
   
+    ** openSSLSym is match faster !! | openSSLAsym because is Asymetric we cant put macth data in encrypte SO it's not working well yet!!
 ````
 🚨 You will have to make migration to add NeoxEncryptor in your entities. 🚨
 ````
   symfony make:migration
   symfony doctrine:migrations:migrate
 ````
-**We have only implemented Halite service to Crypt / unCrypt**
+
+## install openSSL .pem
+To do this: run ClI |-> s neox:encryptor:openssl follow instruction. 
+
 
 **NOTE:** _You may need to use [ symfony composer dump-autoload ] to reload autoloading_
 
@@ -85,9 +81,6 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
 **Now** you can start command (CLI) to encrypt/decrypt entity ... 
 
   * php bin/console neox:encryptor:wasaaaa
-
-
-
 
 Now if you encrypt or decrypt much time, it will just be crypt or decrypt much time. Data will still be manage.
 

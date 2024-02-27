@@ -20,7 +20,7 @@
         name: 'neox:encryptor:openssl',
         description: 'Add a short description for your command',
     )]
-    class NeoxEncryptorWasaaaaCommand extends Command
+    class NeoxEncryptorOpenSSLCommand extends Command
     {
         private const CANCEL = "Cancel";
         private const ALL    = "ALL";
