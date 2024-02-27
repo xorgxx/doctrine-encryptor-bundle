@@ -27,7 +27,7 @@
             // Recover the default encryption service
             $encryptorSystem = $this->parameterBag->get("doctrine_encryptor.encryptor_system");
             // If the encryption system is "OpenSSL" or "Halite", use the getBuildInEncryptor method, otherwise keep the current value.
-            if (preg_match("/^openSSL/", $encryptorSystem) || $encryptorSystem === "Halite") {
+            if (preg_match("/^openSSL/", $encryptorSystem) || $encryptorSystem === "halite") {
                 $encryptorSystem = $this->getBuildInEncryptor($encryptorSystem);
             }
             return $encryptorSystem;
