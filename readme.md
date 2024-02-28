@@ -42,7 +42,10 @@ doctrine_encryptor.yaml file
 ````
 
 ## install openSSL .pem
-To do this: run ClI |-> s neox:encryptor:openssl follow instruction. 
+
+#### You may have to create manually folder : config/OpenSSL
+
+Then : run ClI |-> s neox:encryptor:openssl follow instruction. 
 
 
 **NOTE:** _You may need to use [ symfony composer dump-autoload ] to reload autoloading_
