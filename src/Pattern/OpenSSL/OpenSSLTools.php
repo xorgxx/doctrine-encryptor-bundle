@@ -85,6 +85,7 @@
             $message                = $entity::class . substr($publicKey, 4, 4) . $entity->getId();
             return hash_hmac('gost-crypto', $message , $publicKey);
         }
+        
         public static function getDirectoryOpenSSL(): string
         {
             $directory   = dirname(__DIR__, 6). self::PATH_FOLDER;

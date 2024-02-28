@@ -104,4 +104,16 @@
             
             file_put_contents($file, $newFileContent);
         }
+        
+        public function buildListeEncryptor($excludedItem): array{
+            $listEncryptor = [
+                "Halite (halite)",
+                "openSSLAsymmetric (openSSLAsym)",
+                "openSSLSymmetric (openSSLSym)"
+            ];
+            
+            return  array_filter($listEncryptor, function($item) use ($excludedItem) {
+                return stripos($item, "({$excludedItem})") === false;
+            });
+        }
     }

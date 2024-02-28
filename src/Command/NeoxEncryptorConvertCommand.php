@@ -52,11 +52,11 @@
             $io            = new SymfonyStyle($input, $output);
             $entity[]      = self::ALL;
             $listeAlgos[]  = self::CANCEL;
-            $listEncryptor = [
-                "openSSLAsymmetric (openSSLAsym)",
-                "openSSLSymmetric (openSSLSym)"
-            ];
             
+            $CurrentEncryptor = $this->helperCommand->getCurrentEncryptor();
+            $io->info("Cureent encyptor is : " . $CurrentEncryptor);
+            
+            $listEncryptor      = $this->helperCommand->buildListeEncryptor($CurrentEncryptor);
             $switchEncryptor    = $this->askChoiceQuestion("Please choose ENCRYPTOR to switch to:", $listEncryptor, $input, $output);
             
             $this->processEncryptor($input, $output, $entity);
