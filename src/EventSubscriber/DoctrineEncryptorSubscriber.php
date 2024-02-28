@@ -29,6 +29,7 @@
     {
         public function __construct(readonly DoctrineEncryptorService $doctrineEncryptorService)
         {
+        
         }
         
         public function preUpdate(PreUpdateEventArgs $args): void
@@ -43,6 +44,8 @@
         public function postUpdate(PostUpdateEventArgs $args): void
         {
             $entity = $args->getObject();
+            
+            if ($this->doctrineEncryptorService->encryptOFF()) return;
             
             if (DoctrineEncryptorService::isSupport(get_class($entity))) {
                 // Perform encryption
@@ -60,6 +63,8 @@
         {
             $entity = $args->getObject();
             
+            if ($this->doctrineEncryptorService->encryptOFF()) return;
+            
             if (DoctrineEncryptorService::isSupport(get_class($entity))) {
                 // Perform encryption
                $this->doctrineEncryptorService->encrypt($entity, "prePersist");
@@ -74,6 +79,9 @@
          */
         public function postPersist(PostPersistEventArgs $args): void
         {
+            if ($this->doctrineEncryptorService->encryptOFF()) return;
+
+            
             $entity = $args->getObject();
 
             if (DoctrineEncryptorService::isSupport(get_class($entity))) {
@@ -95,6 +103,8 @@
             // Get the entity being loaded
             $entity = $args->getObject();
             
+            if ($this->doctrineEncryptorService->encryptOFF()) return;
+            
             // Check if the entity needs to be decrypted
             if (DoctrineEncryptorService::isSupport($entity::class)) {
                 // Perform decryption
@@ -115,6 +125,8 @@
         {
             // Get the identity map from the object manager
             $identityMap = $postFlushEventArgs->getObjectManager()->getUnitOfWork()->getIdentityMap();
+            
+            if ($this->doctrineEncryptorService->encryptOFF()) return;
             
             // Iterate through the identity map and check if the entity needs to be decrypted
             foreach ($identityMap as $entityMap) {
@@ -140,6 +152,8 @@
             // Get the UnitOfWork object from the ObjectManager
             $unitOfWork = $onFlushEventArgs->getObjectManager()->getUnitOfWork();
             
+            if ($this->doctrineEncryptorService->encryptOFF()) return;
+            
             foreach ($unitOfWork->getScheduledEntityDeletions() as $entity) {
                 // Check if the entity is eligible for encryption
                 if (DoctrineEncryptorService::isSupport($entity::class)) {
@@ -148,14 +162,4 @@
                 }
             }
         }
-        
-        private function getEncryptorFactory()
-        {
-//            $off = $this->parameterBag->get("neox_doctrine_secure.neox_off");
-//            if ($off) {
-//                return null;
-//            }
-//            return $this->neoxCryptorService;
-        }
-        
     }
