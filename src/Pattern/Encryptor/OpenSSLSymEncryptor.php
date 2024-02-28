@@ -43,7 +43,7 @@
          * SEED :
          * SEED-CBC : IV de 16 octets
          */
-        private string $cipherAlgorithm = 'Camellia-256-CBC';
+        private string $cipherAlgorithm = 'Camellia-256-CBC'; 
 
         public function __construct(readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools)
         {

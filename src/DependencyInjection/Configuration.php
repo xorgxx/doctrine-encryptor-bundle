@@ -29,8 +29,7 @@ final class Configuration implements ConfigurationInterface
             ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('encryptor_off')->defaultFalse()->end()
-                ->scalarNode('encryptor_pws')->defaultValue("!passwordToChange!")->end()
-                ->scalarNode('encryptor_salt')->defaultValue("**5246*#&%&@xW^@")->end()
+                ->scalarNode('encryptor_cipherAlgorithm')->defaultValue("Camellia-256-CBC")->end()
                 ->scalarNode('encryptor_system')->defaultValue("halite")->end()
             ->end()
         ;

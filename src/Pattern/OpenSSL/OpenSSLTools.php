@@ -109,4 +109,12 @@
             // Vérifie si le décodage a réussi et que la chaîne décodée est identique à la chaîne d'origine
             return $decodedString !== false && base64_encode($decodedString) === $string; // La chaîne n'est pas encodée en Base64
         }
+        
+        public static function isSerialized($data) {
+            $unserializedData = @unserialize($data);
+            if ($unserializedData !== false && (is_array($unserializedData) || is_object($unserializedData))) {
+                return $unserializedData;
+            }
+            return $unserializedData == false ? $data : $unserializedData;
+        }
     }

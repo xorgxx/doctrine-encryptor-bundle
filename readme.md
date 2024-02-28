@@ -31,6 +31,7 @@ doctrine_encryptor.yaml file
     # (default)false or true | it will turn off the bundle. by aware that it will render nothing !! field on front will by empty!!
     # this is only for testing purpose in Development mode !!!
     nencryptor_off: false
+    encryptor_cipherAlgorithm: Camellia-256-CBC
     encryptor_system: halite # halite (default) or | openSSLAsym | openSSLSym
   
     ** openSSLSym is match faster !! | openSSLAsym because is Asymetric we cant put macth data in encrypte SO it's not working well yet!!
