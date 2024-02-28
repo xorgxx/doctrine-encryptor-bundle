@@ -39,19 +39,22 @@
         public static function callBackType(string $type, mixed $mode = false)
         {
             $msg = [
-                "string"   => "<enc>",
-                "integer"  => 7,
-                "smallInt" => 77,
-                "bigInt"   => 777,
-                "boolean"  => true,
-                "dateTime" => "2000-02-02 02:02:02",
-                "date"     => "2000-02-02",
-                "time"     => "02:02:02",
-                "float"    => 777.7,
-                "Decimal"  => 777.7,
-                "array"    => ["007" => "007"],
-                "object"   => ["Decimal" => 777.7,
-                               "Array"   => ["007" => "007"]],
+                "string"            => "<enc>",
+                "integer"           => 77777,
+                "int"               => 77777,
+                "smallInt"          => 77,
+                "bigInt"            => 777,
+                "bool"              => true,
+                "boolean"           => true,
+                "dateTime"          => "2000-02-02 02:02:02",
+                "DateTimeImmutable" => "2000-02-02 02:02:02",
+                "date"              => "2000-02-02",
+                "time"              => "02:02:02",
+                "float"             => 777.7,
+                "Decimal"           => 777.7,
+                "array"             => ["007" => "007"],
+                "object"            => ["Decimal" => 777.7],
+                "Array"             => ["007" => "007"],
             ];
             
             return ($mode && in_array($type, $msg, true)) ? true : ($msg[$type] ?? null);
