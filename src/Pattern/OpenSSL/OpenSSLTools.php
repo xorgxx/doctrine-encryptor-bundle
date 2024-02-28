@@ -101,7 +101,8 @@
         
         public static function isBase64($string): bool
         {
-            if (DoctrineEncryptorService::callBackType($string, true)) {
+            $type = gettype($string); // to make sure that $string is a string
+            if (DoctrineEncryptorService::callBackType($type, true)) {
                 return false;
             }
             $decodedString = base64_decode($string, true);
