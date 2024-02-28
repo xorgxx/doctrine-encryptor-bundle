@@ -82,6 +82,16 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
 
   * php bin/console neox:encryptor:wasaaaa
 
+ **Say hello to new command** `neox:encryptor:switch` this will process switch to new encryptor: ex: halite to openSSLSym 
+
+####  Process automatique will do this : ex: halite to openSSLSym
+
+* Decrypt all with the current encryptor halite
+* Modify in doctrine_encryptor.yaml |-> encryptor_system: halite >>> openSSLSym
+* Clear the cache 
+* Then you can encrypt by using `neox:encryptor:wasaaaa` as normally.
+
+
 Now if you encrypt or decrypt much time, it will just be crypt or decrypt much time. Data will still be manage.
 
 ## 🚨 🚨 Danger 🚨🚨

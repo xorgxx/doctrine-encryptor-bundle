@@ -37,7 +37,8 @@
         {
             $this
                 ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
-                ->addOption('option1', null, InputOption::VALUE_NONE, 'Option description');
+                ->addOption('processing', null, InputOption::VALUE_REQUIRED, 'Processing description')
+                ->addOption('action', null, InputOption::VALUE_REQUIRED, 'Action description');
         }
         
         /**
@@ -63,9 +64,10 @@
             }
             
             // Ask user which entity should be moved.
-            $question       = new ChoiceQuestion("Please choose the ENTITY you want work on:", $entity);
-            $question->setErrorMessage('ENTITY : %s does not exist.');
-            $processing     = $this->getHelper('question')->ask($input, $output, $question);
+//            $question       = new ChoiceQuestion("Please choose the ENTITY you want work on:", $entity);
+//            $question->setErrorMessage('ENTITY : %s does not exist.');
+//            $processing     = $this->getHelper('question')->ask($input, $output, $question);
+            $processing = $this->getProcessingOption($input, $output, $entity);
             
             switch ($processing) {
                 case self::CANCEL:
@@ -81,10 +83,12 @@
             
             $io->newLine();
             // ask which action user wants to doo ?
-            $question   = new ChoiceQuestion("Select action : default [". self::CANCEL. "]",
-                [ self::CANCEL, "Encrypt", "Decrypt"], self::CANCEL
-            );
-            $action     = $this->getHelper('question')->ask($input, $output, $question);
+//            $question   = new ChoiceQuestion("Select action : default [". self::CANCEL. "]",
+//                [ self::CANCEL, "Encrypt", "Decrypt"], self::CANCEL
+//            );
+//            $action     = $this->getHelper('question')->ask($input, $output, $question);
+            // ask which action user wants to do?
+            $action = $this->getActionOption($input, $output);
             
             switch ($action) {
                 case self::CANCEL:
@@ -109,5 +113,32 @@
                 }
             }
             return Command::SUCCESS;
+        }
+        
+        private function getProcessingOption(InputInterface $input, OutputInterface $output, array $entity): string
+        {
+            $processing = $input->getOption('processing');
+            
+            if ($processing === null) {
+                $question = new ChoiceQuestion("Please choose the ENTITY you want work on:", $entity);
+                $question->setErrorMessage('ENTITY : %s does not exist.');
+                $processing = $this->getHelper('question')->ask($input, $output, $question);
+            }
+            
+            return $processing;
+        }
+        
+        private function getActionOption(InputInterface $input, OutputInterface $output): string
+        {
+            $action = $input->getOption('action');
+            
+            if ($action === null) {
+                $question = new ChoiceQuestion("Select action : default [" . self::CANCEL . "]",
+                    [self::CANCEL, "Encrypt", "Decrypt"], self::CANCEL
+                );
+                $action = $this->getHelper('question')->ask($input, $output, $question);
+            }
+            
+            return $action;
         }
     }
