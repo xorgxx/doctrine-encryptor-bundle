@@ -31,7 +31,7 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('encryptor_off')->defaultFalse()->end()
                 ->scalarNode('encryptor_pws')->defaultValue("!passwordToChange!")->end()
                 ->scalarNode('encryptor_salt')->defaultValue("**5246*#&%&@xW^@")->end()
-                ->scalarNode('encryptor_system')->defaultValue("Halite")->end()
+                ->scalarNode('encryptor_system')->defaultValue("halite")->end()
             ->end()
         ;
 
