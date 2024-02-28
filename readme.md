@@ -91,7 +91,8 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
 * Clear the cache 
 * Then you can encrypt by using `neox:encryptor:wasaaaa` as normally.
 
-## [ !! ??? WASAAAA ? 😉](https://www.google.com/search?client=firefox-b-d&q=wasaaa)
+## <a href="https://www.google.com/search?client=firefox-b-d&q=wasaaa" target="_blank"> !! ??? WASAAAA ? 😉</a>
+
 Now if you encrypt or decrypt much time, it will just be crypt or decrypt much time. Data will still be manage.
 
 ## 🚨 🚨 Danger 🚨🚨
