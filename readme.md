@@ -134,6 +134,7 @@ If you want to contribute \(thank you!\) to this bundle, here are some guideline
     * You see code that works but isn't covered by any tests \(there is a special place in heaven for you\)
 ## Todo
 * Testing App !! Need help for this.
+* IT DAS NOT CONVERT ADVANCE TYPE (objet, array, date ....)
 * ~~Add a Remote system for storage Hash => Key~~
 * ~~to be able to encrypt/decrypt, according to a propriety type | int, string, phone ....~~
 * ~~Custom provider class Encrypt/decrypt.~~
