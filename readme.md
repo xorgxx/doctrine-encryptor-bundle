@@ -36,6 +36,10 @@ doctrine_encryptor.yaml file
   
     ** openSSLSym is match faster !! | openSSLAsym because is Asymetric we cant put macth data in encrypte SO it's not working well yet!!
 ````
+[Cipher Algorithm list](Doc/cipherAlgorithm.md)
+
+[Encryptor list](Doc/encryptor
+
 🚨 You will have to make migration to add NeoxEncryptor in your entities. 🚨
 ````
   symfony make:migration
