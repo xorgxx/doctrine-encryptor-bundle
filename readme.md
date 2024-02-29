@@ -9,6 +9,8 @@ The aim of this bundle is to establish, in an automatic and transparent manner, 
 system by externalizing data, in strict compliance with European recommendations and the directives of the General Data
 Protection Regulation (GDPR).
 
+
+
 [![Doctrineencryptor-schema.png](https://i.postimg.cc/NG408N8j/Doctrineencryptor-schema.png)](https://postimg.cc/0rzxP0HT)
 
 ## Installation BETA VERSION !!

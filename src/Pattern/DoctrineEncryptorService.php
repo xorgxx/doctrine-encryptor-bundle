@@ -38,6 +38,9 @@
         
         public static function callBackType(string $type, mixed $mode = false)
         {
+            $array = ["007" => "007"];
+            $date  = new \dateTime("2007-07-07 07:07:07");
+            
             $msg = [
                 "string"            => "<enc>",
                 "integer"           => 7,
@@ -46,17 +49,20 @@
                 "bigInt"            => 777,
                 "bool"              => true,
                 "boolean"           => true,
-                "dateTime"          => "2000-02-02 02:02:02",
-                "date"              => "2000-02-02",
-                "time"              => "02:02:02",
+                "dateTime"          => $date,
+                "DateTimeInterface" => $date,
+                "date"              => $date,
+                "time"              => $date,
                 "float"             => 777.7,
                 "Decimal"           => 777.7,
-                "array"             => ["007" => "007"],
-                "object"            => ["Decimal" => "777.7"],
-                "Array"             => ["007" => "007"],
+                "array"             =>  (object) $array,
+                "object"            =>  (object) $array,
+                "Array"             =>  (object) $array,
+                "ArrayObject"       =>  (object) $array,
+                "ArrayIterator"     =>  (object) $array,
             ];
-            
-            return ($mode && in_array($type, $msg, true)) ? true : ($msg[$type] ?? null);
+            $o = ($mode && in_array($type, $msg, true)) ? true : ($msg[$type] ?? null);
+            return $o;
         }
         
         /**
@@ -110,9 +116,13 @@
             
             foreach ($Reflections[$entity::class] as $Reflection) {
                 // process the value Encrypt/decrypt
-                $t          = $this->encryptor->decrypt($Reflection->getValue());
-                $process    = $this->isSerialized($t);
-        
+                if ($this->isSerialized_($Reflection->getValue())){
+                    $t          = $this->encryptor->decrypt($Reflection->getValue());
+                    $process    = $this->isSerialized($t);  
+                }else{
+                    $process    = $Reflection->getValue();
+                }
+               
                 
                 if ($Reflection->getAttributeProperty() === "in") {
                     // process the value Encrypt/decrypt
@@ -250,4 +260,11 @@
             return $unserializedData == false ? $data : $unserializedData;
         }
         
+        private function isSerialized_($data) {
+            $unserializedData = @unserialize($data);
+            if ($unserializedData !== false && (is_array($unserializedData) || is_object($unserializedData))) {
+                return true;
+            }
+            return false;
+        }
     }

@@ -71,6 +71,7 @@
          */
         public function decrypt($plainText): string
         {
+            
             if (OpenSSLTools::isBase64($plainText)) {
                 $secret     = $this->getEncryptionKey();
                 $cipherText = base64_decode($plainText);

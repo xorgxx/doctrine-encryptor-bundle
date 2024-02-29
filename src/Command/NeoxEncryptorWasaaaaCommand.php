@@ -60,8 +60,11 @@
                 $io->title(sprintf('[Find in] Entity : %s ', $entityData['entity']));
                 $io->text($entityData["properties"]);
                 $entity[]   = $entityData['entity'];
-                $entities = [$entityData['entity']];
+                $entities   = [$entityData['entity']];
             }
+            
+            $CurrentEncryptor = $this->helperCommand->getCurrentEncryptor();
+            $io->info("Cureent encyptor is : " . $CurrentEncryptor);
             
             // Ask user which entity should be moved.
 //            $question       = new ChoiceQuestion("Please choose the ENTITY you want work on:", $entity);
@@ -100,18 +103,22 @@
             }
             
             // loop through one/all entities to encrypt/decrypt
-            foreach ($entities as $entity) {
-                if ( $stats = $this->helperCommand->setEntityConvert($entity, $action) ) {
-                    $io->success("Entity : {$entity} has been processed. - {$action}  / {$stats[$action]} " );
+            if($processing == "ALL"){
+                foreach ($entities as $entity) {
+                    if ( $stats = $this->helperCommand->setEntityConvert($entity, $action) ) {
+                        $io->success("Entity : {$entity} has been processed. - {$action}  / {$stats[$action]} " );
+                    }else{
+                        $io->warning("Entity : {$entity} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} " );
+                    }
+                } 
+            }else{
+                if ( $stats = $this->helperCommand->setEntityConvert($processing, $action) ) {
+                    $io->success("Entity : {$processing} has been processed. - {$action}  / {$stats[$action]} " );
                 }else{
-                    $io->warning("Entity : {$entity} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} " );
-                }
-                
-                // If we process a single entity, exit the loop after the first processing
-                if ($processing !== "ALL") {
-                    break;
+                    $io->warning("Entity : {$processing} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} " );
                 }
             }
+
             return Command::SUCCESS;
         }
         

@@ -8,7 +8,7 @@
     {
         private string $type;
         private string $propertyName;
-        private \UnitEnum|float|array|bool|int|string|null $value;
+        private \UnitEnum|\DateTimeInterface|float|array|bool|int|string|null $value;
         private string $attributeProperty;
         private ReflectionProperty $property;
 
@@ -35,12 +35,12 @@
             return $this;
         }
         
-        public function getValue(): \UnitEnum|float|int|bool|array|string|null
+        public function getValue(): \UnitEnum|\DateTimeInterface|float|int|bool|array|string|null
         {
             return $this->value;
         }
         
-        public function setValue(\UnitEnum|float|int|bool|array|string|null $value): ReflectionInfo
+        public function setValue(\UnitEnum|\DateTimeInterface|float|int|bool|array|string|null $value): ReflectionInfo
         {
             $this->value = $value;
             return $this;
