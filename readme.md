@@ -83,11 +83,11 @@ In entity, you want to secure field (data)
     use libphonenumber\PhoneNumber;
     class PhoneFacker implements neoxFackerInterface
     {
-        public function create( string $number = "14155552671"): PhoneNumber
+        public function create( ): PhoneNumber
         {
             return  (new PhoneNumber())
                 ->setCountryCode(33)
-                ->setNationalNumber($number)
+                ->setNationalNumber("14155552671")
             ;
         }
     }
