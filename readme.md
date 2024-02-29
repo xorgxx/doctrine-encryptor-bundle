@@ -37,7 +37,8 @@ doctrine_encryptor.yaml file
     encryptor_system: halite # halite (default) or | openSSLAsym | openSSLSym
   
     ** openSSLSym is match faster !! | openSSLAsym because is Asymetric we cant put macth data in encrypte SO it's not working well yet!!
-````
+    !! Due to instability issues, it is advisable not to use the openSSLAsym encryptor for handling advanced data typing. !!
+    ````
 [Cipher Algorithm list](Doc/cipherAlgorithm.md)
 
 [Encryptor list](Doc/encryptor

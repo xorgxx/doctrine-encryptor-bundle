@@ -56,13 +56,13 @@
                 "time"              => $date,
                 "float"             => 777.7,
                 "Decimal"           => 777.7,
-                "array"             =>  (object) $array,
-                "object"            =>  (object) $array,
-                "Array"             =>  (object) $array,
-                "ArrayObject"       =>  (object) $array,
-                "ArrayIterator"     =>  (object) $array,
+                "array"             => (object)$array,
+                "object"            => (object)$array,
+                "Array"             => (object)$array,
+                "ArrayObject"       => (object)$array,
+                "ArrayIterator"     => (object)$array,
             ];
-            $o = ($mode && in_array($type, $msg, true)) ? true : ($msg[$type] ?? null);
+            $o   = ($mode && in_array($type, $msg, true)) ? true : ($msg[$type] ?? null);
             return $o;
         }
         
@@ -77,8 +77,8 @@
             
             foreach ($Reflections[$entity::class] as $Reflection) {
                 // process the value Encrypt/decrypt
-                $t          = serialize($Reflection->getValue());
-                $process    = $this->encryptor->encrypt($t);
+                $t       = serialize($Reflection->getValue());
+                $process = $this->encryptor->encrypt($t);
                 
                 // get the value of the property
                 if ($Reflection->getAttributeProperty() === "in") {
@@ -89,20 +89,18 @@
                 if ($Reflection->getAttributeProperty() === "out" &&
                     ($event === "postPersist" || $event === "preUpdate" || $event === "convert") &&
                     $this->force === false
-                ) {                    
-                    $neoxEncryptor                         = $this->encryptor->getEncryptorId($entity);
-                    if ($Reflection->getValue()) {
+                ) {
+                    // set the value of the property with the processed value in entity
+                    $neoxEncryptor = $this->encryptor->getEncryptorId($entity);
+                    if ( $Reflection->getValue() ) {
                         $items[$Reflection->getPropertyName()] = $process;
-                        if( $facker =$Reflection->getAttributeFacker() ){
+                        $process                               = self::callBackType($Reflection->getType());
+                        if ($facker = $Reflection->getAttributeFacker()) {
                             $process = (new ReflectionClass($facker))->newInstance()->create();
-                        }else{
-                            $process = self::callBackType($Reflection->getType());
-                        };  
-                    }else{
+                        };
+                    } else {
                         $process = null;
                     }
-            
-                    
                 }
                 // preUpdate source entity will be encrypted
                 $Reflection->getProperty()->setValue($entity, $process);
@@ -127,39 +125,26 @@
             
             foreach ($Reflections[$entity::class] as $Reflection) {
                 // process the value Encrypt/decrypt
-                if ($this->isSerialized_($Reflection->getValue())){
-                    $t          = $this->encryptor->decrypt($Reflection->getValue());
-                    $process    = $this->isSerialized($t);  
-                }else{
-                    $process    = $Reflection->getValue();
+                $propertyValue = $Reflection->getValue();
+                $process       = $propertyValue;
+                if ($this->isSerialized_($propertyValue)) {
+                    $decryptedValue = $this->encryptor->decrypt($propertyValue);
+                    $process        = $this->isSerialized($decryptedValue) ? $decryptedValue : $propertyValue;
                 }
-               
                 
                 if ($Reflection->getAttributeProperty() === "in") {
                     // process the value Encrypt/decrypt
-//                    $process = $this->encryptor->decrypt($Reflection->getValue());
-                    
+                    // $process = $this->encryptor->decrypt($Reflection->getValue());
                 }
                 
                 if ($Reflection->getAttributeProperty() === "out" && $neoxEncryptor->getId()) {
                     $propertyName = $Reflection->getPropertyName();
-                    $content        = json_decode($neoxEncryptor->getContent(), false, 512, JSON_THROW_ON_ERROR);
-                    $value          = isset($content->$propertyName) ? $content->$propertyName : null;
-                    if ($value) {
-                        $t          = $this->encryptor->decrypt($value);
-                        $process    = $this->isSerialized($t);
-                    }else{
-                        $process = null;
-                    }
-                   
-//                    $o = $Reflection->getProperty();
-//                    $o->setValue($entity, $process);
-//                    $m= null;
+                    $content      = json_decode($neoxEncryptor->getContent(), false, 512, JSON_THROW_ON_ERROR);
+                    $value        = isset($content->$propertyName) ?? null;
+                    $process      = $value ? $this->isSerialized($this->encryptor->decrypt($content->$propertyName)) : null;
                 }
                 $Reflection->getProperty()->setValue($entity, $process);
-                $m = null;
             }
-            
             ++$this->neoxStats["Decrypt"];
         }
         
@@ -237,10 +222,8 @@
                     $object->setType($property->getType()->getName());
                     $object->setPropertyName($property->getName());
                     $object->setValue($property->getValue($entity));
-                    
                     $r[$entity::class][] = $object;
                 }
-                
             }
             return $r;
         }
@@ -269,7 +252,8 @@
             return $this->neoxDoctrineFactory->parameterBag->get("doctrine_encryptor.encryptor_off") ?? true;
         }
         
-        private function isSerialized($data) {
+        private function isSerialized($data)
+        {
             $unserializedData = @unserialize($data);
             if ($unserializedData !== false && (is_array($unserializedData) || is_object($unserializedData))) {
                 return $unserializedData;
@@ -277,7 +261,8 @@
             return $unserializedData == false ? $data : $unserializedData;
         }
         
-        private function isSerialized_($data) {
+        private function isSerialized_($data)
+        {
             $unserializedData = @unserialize($data);
             if ($unserializedData !== false && (is_array($unserializedData) || is_object($unserializedData))) {
                 return true;

@@ -36,6 +36,9 @@
                 $secret         = $this->getEncryptionKey();
                 $cipherText     = openssl_public_encrypt($plainText, $encryptedMessage, $secret["publicKey"]);
                 $plainText      = base64_Encode($encryptedMessage);
+                $o = openssl_error_string();
+//            } else {
+//                $plainText = $plainText;
 //            }
             return $plainText;
 
@@ -51,15 +54,11 @@
         {
             if ( OpenSSLTools::isBase64( $plainText ) && $plainText !== '') {
                 $secret     = $this->getEncryptionKey();
-                $cipherText = base64_decode($plainText);
                 openssl_private_decrypt($cipherText, $decryptedMessage, $secret["privateKey"]);
+                $decryptedMessage = base64_decode($decryptedMessage);
                 $plainText  = $decryptedMessage ?? $plainText;
             }
             return $plainText;
-            
-//            $KEYS   = $this->getEncryptionKey();
-//            openssl_private_decrypt($plainText, $decryptedMessage, $KEYS["privateKey"]);
-//            return $decryptedMessage ?? $plainText;
         }
         
         /**
@@ -107,7 +106,6 @@
                 $encryptor = new NeoxEncryptor();
                 $encryptor->setData($indice);
             };
-            
             return $encryptor;
         }
         
