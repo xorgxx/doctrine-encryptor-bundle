@@ -24,6 +24,7 @@
         public function __construct(
             readonly ?string      $build        = 'in',
             readonly ?string      $encrypt      = 'halite',
+            readonly mixed        $facker       = null,
 
         ) {}
     }

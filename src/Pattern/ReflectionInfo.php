@@ -8,8 +8,9 @@
     {
         private string $type;
         private string $propertyName;
-        private \UnitEnum|\DateTimeInterface|float|array|bool|int|string|null $value;
+        private mixed $value;
         private string $attributeProperty;
+        private mixed $attributeFacker;
         private ReflectionProperty $property;
 
         
@@ -35,12 +36,12 @@
             return $this;
         }
         
-        public function getValue(): \UnitEnum|\DateTimeInterface|float|int|bool|array|string|null
+        public function getValue(): mixed
         {
             return $this->value;
         }
         
-        public function setValue(\UnitEnum|\DateTimeInterface|float|int|bool|array|string|null $value): ReflectionInfo
+        public function setValue(mixed $value): ReflectionInfo
         {
             $this->value = $value;
             return $this;
@@ -65,6 +66,17 @@
         public function setAttributeProperty(string $attributeProperty): ReflectionInfo
         {
             $this->attributeProperty = $attributeProperty;
+            return $this;
+        }
+        
+        public function getAttributeFacker(): mixed
+        {
+            return $this->attributeFacker;
+        }
+        
+        public function setAttributeFacker(mixed $attributeFacker): ReflectionInfo
+        {
+            $this->attributeFacker = $attributeFacker;
             return $this;
         }
     }

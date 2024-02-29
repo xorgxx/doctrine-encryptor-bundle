@@ -67,16 +67,33 @@ In entity, you want to secure field (data)
   ....
   
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[neoxEncryptor(build: "out")]
+    #[neoxEncryptor(build: "out", facker : )]
     private ?string $content = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[neoxEncryptor(build: "in")]
     private ?string $description = null;
   
-  ** note that by default #[neoxEncryptor] is build: "in". You can now mixed in your entity
+  ** note that by default #[neoxEncryptor] 
+  * Attribute : build: "in". be default  in / out
+  * Attribute : facker: PhoneFacker::class. be default This give possibility to customize the "facker" for ex: type phoneNumber it's not buildin bundle, but hee you can make service.
+
+  <?php
+    namespace App\Services;
+    use libphonenumber\PhoneNumber;
+    class PhoneFacker implements neoxFackerInterface
+    {
+        public function create( string $number = "14155552671"): PhoneNumber
+        {
+            return  (new PhoneNumber())
+                ->setCountryCode(33)
+                ->setNationalNumber($number)
+            ;
+        }
+    }
   ....
 ````
+
 ## Important !
 Consider the size / length of field you want to crypt when you chose "in" !! ex: length:20
 ````php

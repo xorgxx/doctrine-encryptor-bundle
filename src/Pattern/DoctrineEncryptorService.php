@@ -38,6 +38,7 @@
         
         public static function callBackType(string $type, mixed $mode = false)
         {
+            
             $array = ["007" => "007"];
             $date  = new \dateTime("2007-07-07 07:07:07");
             
@@ -90,8 +91,18 @@
                     $this->force === false
                 ) {                    
                     $neoxEncryptor                         = $this->encryptor->getEncryptorId($entity);
-                    $items[$Reflection->getPropertyName()] = $process;
-                    $process                               = self::callBackType($Reflection->getType());
+                    if ($Reflection->getValue()) {
+                        $items[$Reflection->getPropertyName()] = $process;
+                        if( $facker =$Reflection->getAttributeFacker() ){
+                            $process = (new ReflectionClass($facker))->newInstance()->create();
+                        }else{
+                            $process = self::callBackType($Reflection->getType());
+                        };  
+                    }else{
+                        $process = null;
+                    }
+            
+                    
                 }
                 // preUpdate source entity will be encrypted
                 $Reflection->getProperty()->setValue($entity, $process);
@@ -132,11 +143,15 @@
                 
                 if ($Reflection->getAttributeProperty() === "out" && $neoxEncryptor->getId()) {
                     $propertyName = $Reflection->getPropertyName();
-                    $value        = json_decode($neoxEncryptor->getContent(), false, 512, JSON_THROW_ON_ERROR)->$propertyName;
-                    // process the value Encrypt/decrypt
-//                    $process = $this->encryptor->decrypt($value);
-                    $t          = $this->encryptor->decrypt($value);
-                    $process    = $this->isSerialized($t);
+                    $content        = json_decode($neoxEncryptor->getContent(), false, 512, JSON_THROW_ON_ERROR);
+                    $value          = isset($content->$propertyName) ? $content->$propertyName : null;
+                    if ($value) {
+                        $t          = $this->encryptor->decrypt($value);
+                        $process    = $this->isSerialized($t);
+                    }else{
+                        $process = null;
+                    }
+                   
 //                    $o = $Reflection->getProperty();
 //                    $o->setValue($entity, $process);
 //                    $m= null;
@@ -216,7 +231,9 @@
                 $encryptAttribute = $property->getAttributes(neoxEncryptor::class)[0] ?? null;
                 if ($encryptAttribute !== null) {
                     // Accessing properties of the attribute neoxEncryptor class if "in" or "out"
-                    $object->setAttributeProperty($encryptAttribute->newInstance()->build);
+                    $attriNInstance = $encryptAttribute->newInstance();
+                    $object->setAttributeProperty($attriNInstance->build);
+                    $object->setAttributeFacker($attriNInstance->facker);
                     $object->setType($property->getType()->getName());
                     $object->setPropertyName($property->getName());
                     $object->setValue($property->getValue($entity));
