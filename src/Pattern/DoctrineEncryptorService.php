@@ -261,8 +261,8 @@
         
         private function isSerialized($data)
         {
-            $unserializedData = @unserialize($data); //&& (is_array($unserializedData) || is_object($unserializedData))
-            if ($unserializedData !== false ) {
+            $unserializedData = @unserialize($data); //
+            if ($unserializedData !== false && (is_array($unserializedData) || is_object($unserializedData))) {
                 return $unserializedData;
             }
             return $unserializedData == false ? $data : $unserializedData;
@@ -270,8 +270,8 @@
         
         private function isSerialized_($data)
         {
-            $unserializedData = @unserialize($data);    // && (is_array($unserializedData) || is_object($unserializedData))
-            if ($unserializedData !== false ) {
+            $unserializedData = @unserialize($data);    // && (is_array($unserializedData) || is_object($unserializedData)))
+            if ($unserializedData !== false)  {
                 return true;
             }
             return false;

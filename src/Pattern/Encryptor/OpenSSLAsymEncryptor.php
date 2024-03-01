@@ -36,6 +36,11 @@
                 $secret         = $this->getEncryptionKey();
                 $cipherText     = openssl_public_encrypt($plainText, $encryptedMessage, $secret["publicKey"]);
                 $plainText      = base64_Encode($encryptedMessage);
+                
+                if(!$encryptedMessage){
+                    throw new \Exception("Unable to encrypt message. {$plainText} - Ded you use openSSLAsym ? it das not support (knowladge issue) advance attribute (object, array, ...)!  Conside openSSLSym encryptor. Your data havent been encrypted.");
+                }
+                
                 $o = openssl_error_string();
 //            } else {
 //                $plainText = $plainText;
@@ -52,12 +57,12 @@
          */
         public function decrypt($plainText): string
         {
-            if ( OpenSSLTools::isBase64( $plainText ) && $plainText !== '') {
+//            if ( OpenSSLTools::isBase64( $plainText ) && $plainText !== '') {
                 $secret     = $this->getEncryptionKey();
                 $cipherText = base64_decode($plainText);
                 openssl_private_decrypt($cipherText, $decryptedMessage, $secret["privateKey"]);
                 $plainText  = $decryptedMessage ?? $plainText;
-            }
+//            }
             return $plainText;
         }
         
