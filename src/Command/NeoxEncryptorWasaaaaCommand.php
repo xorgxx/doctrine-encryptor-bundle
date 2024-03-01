@@ -60,7 +60,6 @@
                 $io->title(sprintf('[Find in] Entity : %s ', $entityData['entity']));
                 $io->text($entityData["properties"]);
                 $entity[]   = $entityData['entity'];
-                $entities   = [$entityData['entity']];
             }
             
             $CurrentEncryptor = $this->helperCommand->getCurrentEncryptor();
@@ -104,11 +103,11 @@
             
             // loop through one/all entities to encrypt/decrypt
             if($processing == "ALL"){
-                foreach ($entities as $entity) {
-                    if ( $stats = $this->helperCommand->setEntityConvert($entity, $action) ) {
-                        $io->success("Entity : {$entity} has been processed. - {$action}  / {$stats[$action]} " );
+                foreach ($EntitySupports as $entity) {
+                    if ( $stats = $this->helperCommand->setEntityConvert($entity["entity"], $action) ) {
+                        $io->success("Entity : {$entity["entity"]} has been processed. - {$action}  / {$stats[$action]} " );
                     }else{
-                        $io->warning("Entity : {$entity} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} " );
+                        $io->warning("Entity : {$entity["entity"]} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} " );
                     }
                 } 
             }else{

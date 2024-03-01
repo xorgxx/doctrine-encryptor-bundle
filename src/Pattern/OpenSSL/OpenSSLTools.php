@@ -101,6 +101,9 @@
         
         public static function isBase64($string): bool
         {
+            if ($string === null) {
+                return false;
+            }
 //            $type = gettype($string); // to make sure that $string is a string
             if (DoctrineEncryptorService::callBackType($string, true)) {
                 return false;

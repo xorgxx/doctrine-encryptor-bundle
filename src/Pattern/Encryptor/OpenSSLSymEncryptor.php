@@ -71,11 +71,11 @@
          */
         public function decrypt($plainText): string
         {
-            if (OpenSSLTools::isBase64($plainText)) {
+//            if (OpenSSLTools::isBase64($plainText)) {
                 $secret     = $this->getEncryptionKey();
                 $cipherText = base64_decode($plainText);
                 $plainText  = openssl_decrypt($cipherText, $this->cipherAlgorithm, $secret['pws'], OPENSSL_RAW_DATA, $secret['iv']);
-            }
+//            }
             return $plainText;
         }
         

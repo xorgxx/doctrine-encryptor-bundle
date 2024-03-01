@@ -54,8 +54,8 @@
         {
             if ( OpenSSLTools::isBase64( $plainText ) && $plainText !== '') {
                 $secret     = $this->getEncryptionKey();
+                $cipherText = base64_decode($plainText);
                 openssl_private_decrypt($cipherText, $decryptedMessage, $secret["privateKey"]);
-                $decryptedMessage = base64_decode($decryptedMessage);
                 $plainText  = $decryptedMessage ?? $plainText;
             }
             return $plainText;

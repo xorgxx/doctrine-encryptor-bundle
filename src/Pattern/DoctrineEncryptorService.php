@@ -4,6 +4,7 @@
     
     use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\neoxEncryptor;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Entity\NeoxEncryptor as NeoxEncryptorEntity;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLTools;
     use JsonException;
     use ReflectionClass;
     use ReflectionException;
@@ -127,9 +128,11 @@
                 // process the value Encrypt/decrypt
                 $propertyValue = $Reflection->getValue();
                 $process       = $propertyValue;
-                if ($this->isSerialized_($propertyValue)) {
-                    $decryptedValue = $this->encryptor->decrypt($propertyValue);
-                    $process        = $this->isSerialized($decryptedValue) ? $decryptedValue : $propertyValue;
+                if (OpenSSLTools::isBase64($propertyValue)) {
+                    $decryptedValue     = $this->encryptor->decrypt($propertyValue);
+                    if ($this->isSerialized_($decryptedValue)) {
+                        $process        = $this->isSerialized($decryptedValue) ? $this->isSerialized($decryptedValue) : $propertyValue;
+                    }
                 }
                 
                 if ($Reflection->getAttributeProperty() === "in") {
@@ -143,6 +146,7 @@
                     $value        = isset($content->$propertyName) ?? null;
                     $process      = $value ? $this->isSerialized($this->encryptor->decrypt($content->$propertyName)) : null;
                 }
+                
                 $Reflection->getProperty()->setValue($entity, $process);
             }
             ++$this->neoxStats["Decrypt"];
@@ -165,6 +169,9 @@
          */
         public function setEntityConvert($entity, string $action): void
         {
+            $this->neoxStats["Decrypt"] = 0;
+            $this->neoxStats["Encrypt"] = 0;
+            
             if ($Entity = $this->encryptor->entityManager->getRepository($entity)->findall()) {
                 
                 /**
@@ -254,8 +261,8 @@
         
         private function isSerialized($data)
         {
-            $unserializedData = @unserialize($data);
-            if ($unserializedData !== false && (is_array($unserializedData) || is_object($unserializedData))) {
+            $unserializedData = @unserialize($data); //&& (is_array($unserializedData) || is_object($unserializedData))
+            if ($unserializedData !== false ) {
                 return $unserializedData;
             }
             return $unserializedData == false ? $data : $unserializedData;
@@ -263,8 +270,8 @@
         
         private function isSerialized_($data)
         {
-            $unserializedData = @unserialize($data);
-            if ($unserializedData !== false && (is_array($unserializedData) || is_object($unserializedData))) {
+            $unserializedData = @unserialize($data);    // && (is_array($unserializedData) || is_object($unserializedData))
+            if ($unserializedData !== false ) {
                 return true;
             }
             return false;
