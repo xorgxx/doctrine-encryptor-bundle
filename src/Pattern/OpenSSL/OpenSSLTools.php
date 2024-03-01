@@ -99,13 +99,13 @@
             return $directory;
         }
         
-        public static function isBase64($string): bool
+        public static function isBase64( $string, mixed $type =  null): bool
         {
             if ($string === null) {
                 return false;
             }
-//            $type = gettype($string); // to make sure that $string is a string
-            if (DoctrineEncryptorService::callBackType($string, true)) {
+            $type = gettype($type); // to make sure that $string is a string
+            if (DoctrineEncryptorService::callBackType($type, true)) {
                 return false;
             }
             $decodedString = base64_decode($string, true);

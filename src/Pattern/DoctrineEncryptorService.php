@@ -37,7 +37,7 @@
             return str_contains($cleanContent, neoxEncryptor::class);
         }
         
-        public static function callBackType(string $type, mixed $mode = false)
+        public static function callBackType( $type, mixed $mode = false)
         {
             
             $array = ["007" => "007"];
@@ -107,8 +107,10 @@
                 $Reflection->getProperty()->setValue($entity, $process);
             }
             if ($items) {
+                $this->neoxDoctrineTools->EventListenerPostUpdate();
                 $neoxEncryptor?->setContent(json_encode($items, JSON_THROW_ON_ERROR | false, 512));
                 $this->setNeoxEncryptor($neoxEncryptor);
+                $this->neoxDoctrineTools->EventListenerPostUpdate(true);
             }
             
             ++$this->neoxStats["Encrypt"];
@@ -128,7 +130,7 @@
                 // process the value Encrypt/decrypt
                 $propertyValue = $Reflection->getValue();
                 $process       = $propertyValue;
-                if (OpenSSLTools::isBase64($propertyValue)) {
+                if (OpenSSLTools::isBase64($propertyValue, $Reflection->getType())) {
                     $decryptedValue     = $this->encryptor->decrypt($propertyValue);
                     if ($this->isSerialized_($decryptedValue)) {
                         $process        = $this->isSerialized($decryptedValue) ? $this->isSerialized($decryptedValue) : $propertyValue;

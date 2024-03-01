@@ -21,7 +21,7 @@
     #[AsDoctrineListener(event: Events::onFlush, priority: 500, connection: 'default')]
     #[AsDoctrineListener(event: Events::postLoad, priority: 500, connection: 'default')]
     #[AsDoctrineListener(event: Events::postFlush, priority: 500, connection: 'default')]
-    #[AsDoctrineListener(event: Events::preUpdate, priority: 500, connection: 'default')]
+//    #[AsDoctrineListener(event: Events::preUpdate, priority: 500, connection: 'default')]
     #[AsDoctrineListener(event: Events::postUpdate, priority: 500, connection: 'default')]
     #[AsDoctrineListener(event: Events::prePersist, priority: 500, connection: 'default')]
     #[AsDoctrineListener(event: Events::postPersist, priority: 500, connection: 'default')]
