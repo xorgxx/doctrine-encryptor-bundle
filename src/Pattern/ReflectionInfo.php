@@ -6,13 +6,13 @@
     
     class ReflectionInfo
     {
-        private string $type;
-        private string $propertyName;
-        private mixed $value;
-        private string $attributeProperty;
-        private mixed $attributeFacker;
+        private string             $type;
+        private string             $propertyName;
+        private mixed              $value;
+        private string             $attributeProperty;
+        private mixed              $attributeFacker;
         private ReflectionProperty $property;
-
+        
         
         public function getType(): string
         {

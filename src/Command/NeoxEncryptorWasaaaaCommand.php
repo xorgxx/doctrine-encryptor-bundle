@@ -47,10 +47,10 @@
          */
         protected function execute(InputInterface $input, OutputInterface $output): int
         {
-            $io = new SymfonyStyle($input, $output);
-            $entity[]           = self::CANCEL;
-            $entity[]           = self::ALL;
-            $entities[]         = [];
+            $io         = new SymfonyStyle($input, $output);
+            $entity[]   = self::CANCEL;
+            $entity[]   = self::ALL;
+            $entities[] = [];
             
             // finding all entities with properties to encrypt or decrypt
             $EntitySupports = $this->helperCommand->getListAllEntitySupport();
@@ -59,7 +59,7 @@
             foreach ($EntitySupports as $entityData) {
                 $io->title(sprintf('[Find in] Entity : %s ', $entityData['entity']));
                 $io->text($entityData["properties"]);
-                $entity[]   = $entityData['entity'];
+                $entity[] = $entityData['entity'];
             }
             
             $CurrentEncryptor = $this->helperCommand->getCurrentEncryptor();
@@ -102,22 +102,22 @@
             }
             
             // loop through one/all entities to encrypt/decrypt
-            if($processing == "ALL"){
+            if ($processing == "ALL") {
                 foreach ($EntitySupports as $entity) {
-                    if ( $stats = $this->helperCommand->setEntityConvert($entity["entity"], $action) ) {
-                        $io->success("Entity : {$entity["entity"]} has been processed. - {$action}  / {$stats[$action]} " );
-                    }else{
-                        $io->warning("Entity : {$entity["entity"]} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} " );
+                    if ($stats = $this->helperCommand->setEntityConvert($entity["entity"], $action)) {
+                        $io->success("Entity : {$entity["entity"]} has been processed. - {$action}  / {$stats[$action]} ");
+                    } else {
+                        $io->warning("Entity : {$entity["entity"]} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} ");
                     }
-                } 
-            }else{
-                if ( $stats = $this->helperCommand->setEntityConvert($processing, $action) ) {
-                    $io->success("Entity : {$processing} has been processed. - {$action}  / {$stats[$action]} " );
-                }else{
-                    $io->warning("Entity : {$processing} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} " );
+                }
+            } else {
+                if ($stats = $this->helperCommand->setEntityConvert($processing, $action)) {
+                    $io->success("Entity : {$processing} has been processed. - {$action}  / {$stats[$action]} ");
+                } else {
+                    $io->warning("Entity : {$processing} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} ");
                 }
             }
-
+            
             return Command::SUCCESS;
         }
         
@@ -139,10 +139,13 @@
             $action = $input->getOption('action');
             
             if ($action === null) {
-                $question = new ChoiceQuestion("Select action : default [" . self::CANCEL . "]",
-                    [self::CANCEL, "Encrypt", "Decrypt"], self::CANCEL
+                $question = new ChoiceQuestion(
+                    "Select action : default [" . self::CANCEL . "]",
+                    [self::CANCEL,
+                        "Encrypt",
+                        "Decrypt"], self::CANCEL
                 );
-                $action = $this->getHelper('question')->ask($input, $output, $question);
+                $action   = $this->getHelper('question')->ask($input, $output, $question);
             }
             
             return $action;

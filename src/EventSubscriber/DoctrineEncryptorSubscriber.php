@@ -3,13 +3,10 @@
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\EventSubscriber;
     
     use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
-    use Doctrine\ORM\Event\PostFlushEventArgs;
     use Doctrine\ORM\Event\PostLoadEventArgs;
     use Doctrine\ORM\Event\OnFlushEventArgs;
-    use Doctrine\ORM\Event\PreUpdateEventArgs;
+    use Doctrine\ORM\Event\PostFlushEventArgs;
     use Doctrine\ORM\Event\PostUpdateEventArgs;
-    use Doctrine\ORM\Event\PrePersistEventArgs;
-    use Doctrine\ORM\Event\PostPersistEventArgs;
     use Doctrine\ORM\Events;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\DoctrineEncryptorService;
     use JsonException;
@@ -21,20 +18,13 @@
     #[AsDoctrineListener(event: Events::onFlush, priority: 500, connection: 'default')]
     #[AsDoctrineListener(event: Events::postLoad, priority: 500, connection: 'default')]
     #[AsDoctrineListener(event: Events::postFlush, priority: 500, connection: 'default')]
-//    #[AsDoctrineListener(event: Events::preUpdate, priority: 500, connection: 'default')]
     #[AsDoctrineListener(event: Events::postUpdate, priority: 500, connection: 'default')]
-    #[AsDoctrineListener(event: Events::prePersist, priority: 500, connection: 'default')]
-    #[AsDoctrineListener(event: Events::postPersist, priority: 500, connection: 'default')]
+
     class DoctrineEncryptorSubscriber
     {
         public function __construct(readonly DoctrineEncryptorService $doctrineEncryptorService)
         {
-        
-        }
-        
-        public function preUpdate(PreUpdateEventArgs $args): void
-        {
-            //.....
+            
         }
         
         /**
@@ -43,50 +33,20 @@
          */
         public function postUpdate(PostUpdateEventArgs $args): void
         {
-            $entity = $args->getObject();
+            $entity        = $args->getObject();
+            $entityManager = $args->getObjectManager();
             
             if ($this->doctrineEncryptorService->encryptOFF()) return;
             
             if (DoctrineEncryptorService::isSupport(get_class($entity))) {
+//                --$this->doctrineEncryptorService->neoxStats["Decrypt"];
                 // Perform encryption
-                $this->doctrineEncryptorService->encrypt($entity, "preUpdate");
-            }
-        }
-        
-        // Iterate over the scheduled entity insertions (NEW)
-        
-        /**
-         * @throws ReflectionException
-         * @throws JsonException
-         */
-        public function prePersist(PrePersistEventArgs $args): void
-        {
-            $entity = $args->getObject();
-            
-            if ($this->doctrineEncryptorService->encryptOFF()) return;
-            
-            if (DoctrineEncryptorService::isSupport(get_class($entity))) {
-                // Perform encryption
-               $this->doctrineEncryptorService->encrypt($entity, "prePersist");
-            }
-        }
-        
-        // Iterate over the scheduled entity insertions (NEW)
-        
-        /**
-         * @throws ReflectionException
-         * @throws JsonException
-         */
-        public function postPersist(PostPersistEventArgs $args): void
-        {
-            if ($this->doctrineEncryptorService->encryptOFF()) return;
-
-            
-            $entity = $args->getObject();
-
-            if (DoctrineEncryptorService::isSupport(get_class($entity))) {
-                // Perform encryption
-                $this->doctrineEncryptorService->encrypt($entity, "postPersist");
+                // Encrypt the fields of the entity | Perform encryption
+                if ($this->doctrineEncryptorService->entityCurentState === "Decrypt") {
+                    $this->doctrineEncryptorService->decrypt($entity, "onFlush");
+                    $this->doctrineEncryptorService->entityCurentState = null;
+                    $entityManager->flush();
+                }
             }
         }
         
@@ -124,7 +84,8 @@
         public function postFlush(PostFlushEventArgs $postFlushEventArgs): void
         {
             // Get the identity map from the object manager
-            $identityMap = $postFlushEventArgs->getObjectManager()->getUnitOfWork()->getIdentityMap();
+            $identityMap   = $postFlushEventArgs->getObjectManager()->getUnitOfWork()->getIdentityMap();
+            $entityManager = $postFlushEventArgs->getEntityManager();
             
             if ($this->doctrineEncryptorService->encryptOFF()) return;
             
@@ -132,8 +93,12 @@
             foreach ($identityMap as $entityMap) {
                 foreach ($entityMap as $entity) {
                     if (DoctrineEncryptorService::isSupport($entity::class)) {
-                            // Perform decryption normal
-                            $this->doctrineEncryptorService->decrypt($entity, "postFlush");
+                        // Encrypt the fields of the entity | Perform encryption
+                        if ($this->doctrineEncryptorService->neoxStats["wasaaaa"]) continue;
+                        $this->doctrineEncryptorService->encrypt($entity, "onFlush");
+                        $entityManager->flush();
+                        // this is to return uncrypted value (to show front after create)
+                        $this->doctrineEncryptorService->decrypt($entity, "onFlush");
                     }
                 }
             }
@@ -150,9 +115,26 @@
         public function onFlush(OnFlushEventArgs $onFlushEventArgs): void
         {
             // Get the UnitOfWork object from the ObjectManager
-            $unitOfWork = $onFlushEventArgs->getObjectManager()->getUnitOfWork();
+            $unitOfWork    = $onFlushEventArgs->getObjectManager()->getUnitOfWork();
+            $entityManager = $onFlushEventArgs->getEntityManager();
             
             if ($this->doctrineEncryptorService->encryptOFF()) return;
+            
+            // Iterate through the scheduled entity insertions
+            foreach ($unitOfWork->getScheduledEntityInsertions() as $entity) {
+                
+                // Check if the entity is eligible for encryption
+                if (DoctrineEncryptorService::isSupport($entity::class)) {
+                    // Encrypt the fields of the entity | Perform encryption
+                }
+            }
+            
+            foreach ($unitOfWork->getScheduledEntityUpdates() as $entity) {
+                // Check if the entity is eligible for encryption
+                if (DoctrineEncryptorService::isSupport($entity::class)) {
+                    
+                }
+            }
             
             foreach ($unitOfWork->getScheduledEntityDeletions() as $entity) {
                 // Check if the entity is eligible for encryption
@@ -161,5 +143,7 @@
                     $this->doctrineEncryptorService->remove($entity);
                 }
             }
+            
+            
         }
     }

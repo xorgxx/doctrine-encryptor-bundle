@@ -16,7 +16,7 @@
             $this->eventManager = $this->doctrine->getManager()->getEventManager();
         }
         
-        public  function EventListenerPostLoad(bool $stat = false): void
+        public function EventListenerPostLoad(bool $stat = false): void
         {
             $method = $this->getAction($stat);
             $this->eventManager->$method([Events::postLoad], DoctrineEncryptorSubscriber::class);
@@ -28,14 +28,14 @@
             $this->eventManager->$method([Events::onFlush], DoctrineEncryptorSubscriber::class);
         }
         
-        public  function EventListenerPostUpdate(bool $stat = false): void
+        public function EventListenerPostUpdate(bool $stat = false): void
         {
             $method = $this->getAction($stat);
             $this->eventManager->$method([Events::postUpdate], DoctrineEncryptorSubscriber::class);
         }
         
         
-        public  function EventListenerPostFlush(bool $stat = false): void
+        public function EventListenerPostFlush(bool $stat = false): void
         {
             $method = $this->getAction($stat);
             $this->eventManager->$method([Events::postFlush], DoctrineEncryptorSubscriber::class);

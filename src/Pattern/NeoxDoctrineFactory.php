@@ -31,13 +31,6 @@
                 $encryptorSystem = $this->getBuildInEncryptor($encryptorSystem);
             }
             return $encryptorSystem;
-            
-            // build path to services encrypt for windows or linux
-            // NeoxDoctrineSecure\NeoxDoctrineSecureBundle\Pattern\Services
-//            $parts              = ["NeoxDoctrineSecure", "NeoxDoctrineSecureBundle", "Pattern", "Services"];
-//            $namespace          = implode(DIRECTORY_SEPARATOR, $parts) . DIRECTORY_SEPARATOR;
-//
-//            return $namespace . ucfirst($service) . "Service";
         }
         
         private function getBuildInEncryptor(string $name): string

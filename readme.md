@@ -53,7 +53,7 @@ doctrine_encryptor.yaml file
 
 #### You may have to create manually folder : config/OpenSSL
 
-Then : run ClI |-> s neox:encryptor:openssl follow instruction. 
+Then : run ClI |-> php bin/console neox:encryptor:openssl follow instruction. 
 
 
 **NOTE:** _You may need to use [ symfony composer dump-autoload ] to reload autoloading_
@@ -110,14 +110,14 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
 
   * php bin/console neox:encryptor:wasaaaa
 
- **Say hello to new command** `neox:encryptor:switch` this will process switch to new encryptor: ex: halite to openSSLSym 
+ **Say hello to new command** `php bin/console neox:encryptor:switch` this will process switch to new encryptor: ex: halite to openSSLSym 
 
 ####  Process automatique will do this : ex: halite to openSSLSym
 
 * Decrypt all with the current encryptor halite
 * Modify in doctrine_encryptor.yaml |-> encryptor_system: halite >>> openSSLSym
 * Clear the cache 
-* Then you can encrypt by using `neox:encryptor:wasaaaa` as normally.
+* Then you can encrypt by using `php bin/console neox:encryptor:wasaaaa` as normally.
 
 ## <a href="https://www.google.com/search?client=firefox-b-d&q=wasaaa" target="_blank"> !! ??? WASAAAA ? 😉</a>
 

@@ -1,7 +1,7 @@
 <?php
     
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\Encryptor;
-
+    
     use Doctrine\ORM\EntityManagerInterface;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Entity\NeoxEncryptor;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\EncryptorInterface;
@@ -44,7 +44,8 @@
             $Halite = Halite::VERSION_PREFIX;
             // if it is already Encrypted then Decrypted
             if (!preg_match("/^{$Halite}/", $field)) {
-                [$encryptionKey, $message] = $this->getEncryptionKey($field);
+                [$encryptionKey,
+                    $message] = $this->getEncryptionKey($field);
                 return Crypto::encrypt($message, $encryptionKey);
             }
             return $field;
@@ -66,7 +67,8 @@
             
             // if it is already Encrypted then Decrypted
             if (preg_match("/^{$Halite}/", $field)) {
-                [$encryptionKey, $message] = $this->getEncryptionKey($field);
+                [$encryptionKey,
+                    $message] = $this->getEncryptionKey($field);
                 return Crypto::decrypt($message->getString(), $encryptionKey)->getString();
             }
             return $field;
@@ -80,12 +82,13 @@
          */
         public function getEncryptionKey(string $msg = ""): array
         {
-            $secret         = OpenSSLTools::getPwsSalt();
-            $key            = new HiddenString($secret['pws']);
-            $message        = new HiddenString($msg);
-            $encryptionKey  = KeyFactory::deriveEncryptionKey($key, substr($secret['salt'], 0, 16));
-
-            return [$encryptionKey, $message];
+            $secret        = OpenSSLTools::getPwsSalt();
+            $key           = new HiddenString($secret['pws']);
+            $message       = new HiddenString($msg);
+            $encryptionKey = KeyFactory::deriveEncryptionKey($key, substr($secret['salt'], 0, 16));
+            
+            return [$encryptionKey,
+                $message];
         }
         
         /**
@@ -96,8 +99,8 @@
         public function getEncryptorId($entity): ?NeoxEncryptor
         {
             // ff5d400f96d533dfda3018dc7dce45f5
-            $indice     = OpenSSLTools::builderIndice($entity);
-            if ( !$encryptor = $this->entityManager->getRepository(NeoxEncryptor::class)->findOneBy(['data' => $indice]) ){
+            $indice = OpenSSLTools::builderIndice($entity);
+            if (!$encryptor = $this->entityManager->getRepository(NeoxEncryptor::class)->findOneBy(['data' => $indice])) {
                 $encryptor = new NeoxEncryptor();
                 $encryptor->setData($indice);
             };

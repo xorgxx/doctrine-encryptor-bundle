@@ -11,13 +11,15 @@
     
     class DoctrineEncryptorService
     {
-        public array $encryptors = [];
-        public array $neoxStats = [
+        public array   $encryptors        = [];
+        public array   $neoxStats         = [
+            "wasaaaa" => 0,
             "Encrypt" => 0,
             "Decrypt" => 0,
         ];
-        private bool $force = false;
-        private mixed $encryptor;
+        private bool   $force             = false;
+        private mixed  $encryptor;
+        public ?string $entityCurentState = null;
         
         public function __construct(readonly NeoxDoctrineFactory $neoxDoctrineFactory, readonly NeoxDoctrineTools $neoxDoctrineTools)
         {
@@ -37,7 +39,7 @@
             return str_contains($cleanContent, neoxEncryptor::class);
         }
         
-        public static function callBackType( $type, mixed $mode = false)
+        public static function callBackType($type, mixed $mode = false)
         {
             
             $array = ["007" => "007"];
@@ -63,7 +65,8 @@
                 "ArrayObject"       => (object)$array,
                 "ArrayIterator"     => (object)$array,
             ];
-            $o   = ($mode && in_array($type, $msg, true)) ? true : ($msg[$type] ?? null);
+            
+            $o = ($mode && in_array($type, $msg, true)) ? true : ($msg[$type] ?? null);
             return $o;
         }
         
@@ -87,17 +90,14 @@
 //                    $Reflection->getProperty()->setValue($entity, $process);
                 }
                 
-                if ($Reflection->getAttributeProperty() === "out" &&
-                    ($event === "postPersist" || $event === "preUpdate" || $event === "convert") &&
-                    $this->force === false
-                ) {
+                if ($Reflection->getAttributeProperty() === "out") {
                     // set the value of the property with the processed value in entity
                     $neoxEncryptor = $this->encryptor->getEncryptorId($entity);
-                    if ( $Reflection->getValue() ) {
+                    if ($Reflection->getValue()) {
                         $items[$Reflection->getPropertyName()] = $process;
                         $process                               = self::callBackType($Reflection->getType());
                         if ($facker = $Reflection->getAttributeFacker()) {
-                            $process = (new ReflectionClass($facker))->newInstance()->create();
+                            $process = (new $facker)->create();
                         };
                     } else {
                         $process = null;
@@ -106,14 +106,14 @@
                 // preUpdate source entity will be encrypted
                 $Reflection->getProperty()->setValue($entity, $process);
             }
+            
             if ($items) {
-                $this->neoxDoctrineTools->EventListenerPostUpdate();
+                $this->entityCurentState = $entity::class;
                 $neoxEncryptor?->setContent(json_encode($items, JSON_THROW_ON_ERROR | false, 512));
-                $this->setNeoxEncryptor($neoxEncryptor);
-                $this->neoxDoctrineTools->EventListenerPostUpdate(true);
+                $this->encryptor->entityManager->persist($neoxEncryptor);
             }
             
-            ++$this->neoxStats["Encrypt"];
+            ++$this->neoxStats["wasaaaa"];
         }
         
         /**
@@ -131,13 +131,12 @@
                 $propertyValue = $Reflection->getValue();
                 $process       = $propertyValue;
                 if (OpenSSLTools::isBase64($propertyValue, $Reflection->getType())) {
-                    $decryptedValue     = $this->encryptor->decrypt($propertyValue);
-                    if ($this->isSerialized_($decryptedValue)) {
-                        $process        = $this->isSerialized($decryptedValue) ? $this->isSerialized($decryptedValue) : $propertyValue;
-                    }
+                    $decryptedValue = $this->encryptor->decrypt($propertyValue);
+                    $process = $this->isSerialized($decryptedValue);
                 }
                 
                 if ($Reflection->getAttributeProperty() === "in") {
+                    
                     // process the value Encrypt/decrypt
                     // $process = $this->encryptor->decrypt($Reflection->getValue());
                 }
@@ -148,10 +147,9 @@
                     $value        = isset($content->$propertyName) ?? null;
                     $process      = $value ? $this->isSerialized($this->encryptor->decrypt($content->$propertyName)) : null;
                 }
-                
                 $Reflection->getProperty()->setValue($entity, $process);
             }
-            ++$this->neoxStats["Decrypt"];
+            
         }
         
         /**
@@ -171,40 +169,35 @@
          */
         public function setEntityConvert($entity, string $action): void
         {
+            $this->neoxStats["wasaaaa"] = 0; //-> Yes i know ! feel strange but we need this !!
             $this->neoxStats["Decrypt"] = 0;
             $this->neoxStats["Encrypt"] = 0;
-            
             if ($Entity = $this->encryptor->entityManager->getRepository($entity)->findall()) {
-                
+    
                 /**
                  * Important : Reset the listeners !! it will loop for ever !!
                  * THIS should affect only this instance of DoctrineEncryptor
                  **/
-                $this->neoxDoctrineTools->EventListenerPostFlush();
-                $this->neoxDoctrineTools->EventListenerPostUpdate();
                 
                 foreach ($Entity as $item) {
+                    
                     if ($action === "Decrypt") {
-//                        $this->decrypt($item, "convert", false);
+                        ++$this->neoxStats["Decrypt"];
                         // check if property is encrypted in NeoxEncryptor if yes delete
                         if ($neoxEncryptor = $this->encryptor->getEncryptorId($item)) {
                             $this->encryptor->entityManager->remove($neoxEncryptor);
                         }
-                        $this->encryptor->entityManager->persist($item);
+                        $this->entityCurentState = "Decrypt";
                     } else {
+                        ++$this->neoxStats["Encrypt"];
                         $this->encrypt($item, "convert", false);
+                        $this->encryptor->entityManager->persist($item);
+                        $this->entityCurentState = $item::class;
                     }
-                    
+                    $this->encryptor->entityManager->flush();
                 }
-                // flush the changes
-                $this->encryptor->entityManager->flush();
-                
-                // Important : restart the listeners !!
-                $this->neoxDoctrineTools->EventListenerOnFlush(true);
-                $this->neoxDoctrineTools->EventListenerPostUpdate(true);
             }
         }
-        
         
         /**
          * @throws ReflectionException
@@ -243,19 +236,6 @@
             $this->encryptor = $this->neoxDoctrineFactory->buildEncryptor();
         }
         
-        /**
-         * @param $neoxEncryptor
-         *
-         * @return void
-         */
-        private function setNeoxEncryptor($neoxEncryptor): void
-        {
-            $this->force = true;
-            $this->encryptor->entityManager->persist($neoxEncryptor);
-            $this->encryptor->entityManager->flush();
-            $this->force = false;
-        }
-        
         public function encryptOFF()
         {
             return $this->neoxDoctrineFactory->parameterBag->get("doctrine_encryptor.encryptor_off") ?? true;
@@ -270,12 +250,4 @@
             return $unserializedData == false ? $data : $unserializedData;
         }
         
-        private function isSerialized_($data)
-        {
-            $unserializedData = @unserialize($data);    // && (is_array($unserializedData) || is_object($unserializedData)))
-            if ($unserializedData !== false)  {
-                return true;
-            }
-            return false;
-        }
     }

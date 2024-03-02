@@ -1,10 +1,10 @@
 <?php
     /********************** OpenSSLEncryptor.php ***********************************************
-    * CODE EXPERIMENTAL - DO NOT USE IN PRODUCTION
-    *******************************************************************************************/
+     * CODE EXPERIMENTAL - DO NOT USE IN PRODUCTION
+     *******************************************************************************************/
     
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\Encryptor;
-
+    
     use Doctrine\ORM\EntityManagerInterface;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Entity\NeoxEncryptor;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\EncryptorInterface;
@@ -43,8 +43,8 @@
          * SEED :
          * SEED-CBC : IV de 16 octets
          */
-        private string $cipherAlgorithm = 'Camellia-256-CBC'; 
-
+        private string $cipherAlgorithm = 'Camellia-256-CBC';
+        
         public function __construct(readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools)
         {
         }
@@ -57,9 +57,9 @@
         public function encrypt($plainText): string
         {
 //            if (OpenSSLTools::isBase64($plainText)) {
-                $secret         = $this->getEncryptionKey();
-                $cipherText     = openssl_encrypt($plainText, $this->cipherAlgorithm, $secret['pws'], OPENSSL_RAW_DATA, $secret['iv']);
-                $plainText      = base64_Encode($cipherText);
+            $secret     = $this->getEncryptionKey();
+            $cipherText = openssl_encrypt($plainText, $this->cipherAlgorithm, $secret['pws'], OPENSSL_RAW_DATA, $secret['iv']);
+            $plainText  = base64_Encode($cipherText);
 //            }
             return $plainText;
         }
@@ -72,9 +72,9 @@
         public function decrypt($plainText): string
         {
 //            if (OpenSSLTools::isBase64($plainText)) {
-                $secret     = $this->getEncryptionKey();
-                $cipherText = base64_decode($plainText);
-                $plainText  = openssl_decrypt($cipherText, $this->cipherAlgorithm, $secret['pws'], OPENSSL_RAW_DATA, $secret['iv']);
+            $secret     = $this->getEncryptionKey();
+            $cipherText = base64_decode($plainText);
+            $plainText  = openssl_decrypt($cipherText, $this->cipherAlgorithm, $secret['pws'], OPENSSL_RAW_DATA, $secret['iv']);
 //            }
             return $plainText;
         }
@@ -86,10 +86,10 @@
          */
         public function getEncryptionKey(string $msg = ""): array
         {
-            $secret                     = OpenSSLTools::getPwsSalt();
-            $ivLength                   = openssl_cipher_iv_length($this->cipherAlgorithm);
-            $EncryptionKey["iv"]        = substr($secret['salt'], 0, $ivLength);
-            $EncryptionKey["pws"]       = substr($secret['pws'], 0, 32);
+            $secret               = OpenSSLTools::getPwsSalt();
+            $ivLength             = openssl_cipher_iv_length($this->cipherAlgorithm);
+            $EncryptionKey["iv"]  = substr($secret['salt'], 0, $ivLength);
+            $EncryptionKey["pws"] = substr($secret['pws'], 0, 32);
             
             return $EncryptionKey;
         }
@@ -102,8 +102,8 @@
         public function getEncryptorId($entity): ?NeoxEncryptor
         {
             // ff5d400f96d533dfda3018dc7dce45f5
-            $indice     = OpenSSLTools::builderIndice($entity);
-            if ( !$encryptor = $this->entityManager->getRepository(NeoxEncryptor::class)->findOneBy(['data' => $indice]) ){
+            $indice = OpenSSLTools::builderIndice($entity);
+            if (!$encryptor = $this->entityManager->getRepository(NeoxEncryptor::class)->findOneBy(['data' => $indice])) {
                 $encryptor = new NeoxEncryptor();
                 $encryptor->setData($indice);
             };
