@@ -61,6 +61,9 @@
             $cipherText = openssl_encrypt($plainText, $this->cipherAlgorithm, $secret['pws'], OPENSSL_RAW_DATA, $secret['iv']);
             $plainText  = base64_Encode($cipherText);
 //            }
+            if (!$cipherText) {
+                throw new \Exception("Unable to encrypt message. {$plainText} - is this string !?? (knowladge issue).  Your data havent been encrypted.");
+            }
             return $plainText;
         }
         
