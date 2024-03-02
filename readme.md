@@ -37,7 +37,7 @@ doctrine_encryptor.yaml file
     encryptor_system: halite # halite | openSSLSym | openSSLAsym (das not support advance typing (obejt, array, ...) yet) 
   
     ** openSSLSym is match faster !! | openSSLAsym because is Asymetric we cant put macth data in encrypte SO it's not working well yet!!
-    !! Due to instability issues, it is advisable not to use the openSSLAsym encryptor for handling advanced data typing (obejt, array, ...).!!
+    🚨 Due to instability issues (after ~100 caractes), it is advisable not to use the openSSLAsym encryptor for handling advanced data typing (obejt, array, ...).!!
     ````
 [Cipher Algorithm list](Doc/cipherAlgorithm.md)
 
