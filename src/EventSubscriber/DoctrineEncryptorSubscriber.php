@@ -42,27 +42,17 @@
 
             if( DoctrineEncryptorService::isSupport( get_class( $entity ) ) ) {
 
-                /*
-                                // Encrypt the fields of the entity | Perform encryption
-                                if( $this->doctrineEncryptorService->entityCurentState === "Decrypt" ) {
-                                    $this->doctrineEncryptorService->decrypt( $entity, "onFlush" );
-                                    $this->doctrineEncryptorService->entityCurentState = null;
-                                    $entityManager->flush();
-                                }
-                */
-
-                if ($this->doctrineEncryptorService->entityCurentState === "Decrypt") {
-                    foreach ($entityManager->getUnitOfWork()->getScheduledEntityUpdates() as $entity) {
-                        if (DoctrineEncryptorService::isSupport(get_class($entity))) {
-                            $this->doctrineEncryptorService->decrypt($entity, "onFlush");
-                        }
+                if( DoctrineEncryptorService::isSupport( get_class( $entity ) ) ) {
+                    // Encrypt the fields of the entity | Perform encryption
+                    if( $this->doctrineEncryptorService->entityCurentState === "Decrypt" ) {
+                        $this->doctrineEncryptorService->decrypt( $entity, "onFlush" );
+                        $this->doctrineEncryptorService->entityCurentState = null;
+                        /**
+                         * TODO : not really sure to doing flush here is best practice ?
+                         * but i need to think about it !!
+                         */
+                        $entityManager->flush();
                     }
-                    $this->doctrineEncryptorService->entityCurentState = null;
-                    /**
-                     * TODO : not realy shur to doing flush here is best practice ?
-                     * but i need to think about it !!
-                     */
-                    $entityManager->flush();
                 }
             }
         }
