@@ -9,6 +9,7 @@
     use ReflectionException;
     use Symfony\Component\Console\Attribute\AsCommand;
     use Symfony\Component\Console\Command\Command;
+    use Symfony\Component\Console\Input\ArrayInput;
     use Symfony\Component\Console\Input\InputArgument;
     use Symfony\Component\Console\Input\InputInterface;
     use Symfony\Component\Console\Input\InputOption;
@@ -92,6 +93,18 @@
             // process ascymetric encryption
             $r = OpenSSLTools::buildAsymetricKey($algoOpen, $KeyLengths);
             
+            $this->processHaliteKey($input, $output);
+
+            $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+            
             return Command::SUCCESS;
+        }
+
+        private function processHaliteKey(InputInterface $input, OutputInterface $output): void
+        {
+            $autreCommande          = $this->getApplication()->find('n:e:h');
+            $autreCommandeArguments = [];
+            $autreCommandeInput     = new ArrayInput($autreCommandeArguments);
+            $autreCommande->run($autreCommandeInput, $output);
         }
     }
