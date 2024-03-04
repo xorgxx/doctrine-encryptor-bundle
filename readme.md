@@ -33,8 +33,8 @@ doctrine_encryptor.yaml file
     # (default)false or true | it will turn off the bundle. by aware that it will render nothing !! field on front will by empty!!
     # this is only for testing purpose in Development mode !!!
     nencryptor_off: false
-    encryptor_cipherAlgorithm: Camellia-256-CBC
-    encryptor_system: halite # halite | openSSLSym | openSSLAsym (das not support advance typing (obejt, array, ...) yet) 
+    encryptor_cipherAlgorithm: AES-256-CBC  # AES-256-CBC | !!! Camellia-256-CBC !!!
+    encryptor_system: halite # halite | openSSLSym | !!! openSSLAsym !!! (das not support advance typing (obejt, array, ...) yet) 
   
     ** openSSLSym is match faster !! | openSSLAsym because is Asymetric we cant put macth data in encrypte SO it's not working well yet!!
     🚨 Due to instability issues (after ~100 caractes), it is advisable not to use the openSSLAsym encryptor for handling advanced data typing (obejt, array, ...).!!

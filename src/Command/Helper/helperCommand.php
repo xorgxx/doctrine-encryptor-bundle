@@ -104,7 +104,30 @@
             
             file_put_contents($file, $newFileContent);
         }
-        
+
+        public function checkKeyExist(){
+            $file        = dirname(__DIR__, 6) . '/config/packages/doctrine_encryptor.yaml';
+            return  file($file, FILE_IGNORE_NEW_LINES);
+        }
+
+        public function deleteKeyExist(){
+            $file        = dirname(__DIR__, 6) . '/config/packages/doctrine_encryptor.yaml';
+            $lines       = file($file, FILE_IGNORE_NEW_LINES);
+
+            foreach ($lines as $line) {
+                if (file_exists($file_path)) {
+                    // Supprime le fichier
+                    if (unlink($file_path)) {
+                        echo "Le fichier a été supprimé avec succès.";
+                    } else {
+                        echo "Une erreur s'est produite lors de la suppression du fichier.";
+                    }
+                } else {
+                    echo "Le fichier n'existe pas.";
+                }
+            }
+
+        }
         public function buildListeEncryptor($excludedItem): array{
             $listEncryptor = [
                 "Halite (halite)",

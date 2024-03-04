@@ -51,7 +51,7 @@
                          * TODO : not really sure to doing flush here is best practice ?
                          * but i need to think about it !!
                          */
-                        $entityManager->flush();
+//                        $entityManager->flush();
                     }
                 }
             }
@@ -111,7 +111,7 @@
                              * TODO : not realy shur to doing flush here is best practice ?
                              * but i need to think about it !!
                              */
-                            $entityManager->flush();
+                            $entityManager->flush($entity);
 
                             // This is to return uncrypted value( to show front after create)
                             $this->doctrineEncryptorService->decrypt( $entity, "onFlush" );

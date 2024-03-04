@@ -8,9 +8,9 @@
     
     class OpenSSLTools
     {
-        const PRIVATE_KEY = 'doctrine_encryptor_private.pem';
-        const PUBLIC_KEY  = 'doctrine_encryptor_public.pem';
-        const PATH_FOLDER = '/config/OpenSSL/';
+        const PRIVATE_KEY = 'openSSL_private.pem';
+        const PUBLIC_KEY  = 'openSSL_public.pem';
+        const PATH_FOLDER = '/config/doctrine-encryptor/';
         const PREFIX      = 'NEOX';
         
         public function __construct(readonly ParameterBagInterface $parameterBag)
@@ -19,7 +19,7 @@
         
         public static function buildAsymetricKey(string $algoOpen, string $KeyLengths): void
         {
-            $directory      = dirname(__DIR__, 6) . '/config/OpenSSL/';
+            $directory      = dirname(__DIR__, 6) . SELF::PATH_FOLDER;
             $privateKeyFile = $directory . self::PRIVATE_KEY;
             $publicKeyFile  = $directory . self::PUBLIC_KEY;
             
@@ -77,6 +77,26 @@
             $keyContent["salt"] = hash_hmac_file('gost-crypto', 'file://' . $publicKey, 'test');
             
             return $keyContent;
+        }
+
+        public static function deleleteAsymetricKey(){
+            $directory      = dirname(__DIR__, 6) . SELF::PATH_FOLDER;
+            $privateKeyFile = $directory . self::PRIVATE_KEY;
+            $publicKeyFile  = $directory . self::PUBLIC_KEY;
+
+            // Verify that the directory is writable
+            if (!is_writable($directory)) {
+                throw new \RuntimeException("Directory $directory is not writable.");
+            }
+
+            // Check if the keystores already exist
+            if (file_exists($privateKeyFile) || file_exists($publicKeyFile)) {
+                unlink($privateKeyFile);
+                unlink($publicKeyFile);
+                echo "Key files deleted\n";
+                return true;
+            }
+            return false;
         }
         
         public static function builderIndice($entity): string

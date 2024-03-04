@@ -108,7 +108,6 @@
 
             }
 
-
             if ($items) {
                 $this->entityCurentState = $entity::class;
                 $neoxEncryptor?->setContent(json_encode($items, JSON_THROW_ON_ERROR | false, 512));
@@ -180,14 +179,16 @@
                  **/
 
                 foreach ($Entity as $item) {
-
+                    $this->neoxStats["wasaaaa"] = 1;
                     if ($action === "Decrypt") {
                         ++$this->neoxStats["Decrypt"];
+                        $this->entityCurentState = "Decrypt";
                         // check if property is encrypted in NeoxEncryptor if yes delete
-                        if ($neoxEncryptor = $this->encryptor->getEncryptorId($item)) {
+                        $neoxEncryptor = $this->encryptor->getEncryptorId($item);
+                        if ($neoxEncryptor->getid()) {
                             $this->encryptor->entityManager->remove($neoxEncryptor);
                         }
-                        $this->entityCurentState = "Decrypt";
+
                     } else {
                         ++$this->neoxStats["Encrypt"];
                         $this->encrypt($item, "convert", false);
