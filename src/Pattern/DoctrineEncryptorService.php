@@ -18,7 +18,7 @@
             "Decrypt" => 0,
         ];
         private bool   $force             = false;
-        private mixed  $encryptor;
+        public mixed   $encryptor;
         public ?string $entityCurentState = null;
 
         public function __construct(readonly NeoxDoctrineFactory $neoxDoctrineFactory, readonly NeoxDoctrineTools $neoxDoctrineTools)
@@ -66,8 +66,10 @@
                 "ArrayIterator"     => (object)$array,
             ];
 
-            $o = ($mode && in_array($type, $msg, true)) ? true : ($msg[$type] ?? null);
-            return $o;
+            if ( $mode && (is_object( $type ) || is_array( $type )) ) return $type;
+
+            return ($mode && in_array($type, $msg, true)) ? true : ($msg[$type] ?? null);
+
         }
 
         /**
@@ -241,7 +243,7 @@
             return $this->neoxDoctrineFactory->parameterBag->get("doctrine_encryptor.encryptor_off") ?? true;
         }
 
-        private function isSerialized($data)
+        public function isSerialized( $data)
         {
             $unserializedData = @unserialize($data); //
             if ($unserializedData !== false && (is_array($unserializedData) || is_object($unserializedData))) {
