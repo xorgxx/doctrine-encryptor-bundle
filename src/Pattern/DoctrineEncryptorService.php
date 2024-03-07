@@ -31,7 +31,14 @@
          */
         public static function isSupport(string $className): bool
         {
+
             $filename    = (new ReflectionClass($className))->getFileName();
+
+            // to not provide of NeoxEncryptorEntity
+            if ( $filename instanceof NeoxEncryptorEntity ) {
+                return false;
+            }
+
             $fileContent = file_get_contents($filename);
 
             // Search for neoxEncryptor in file contents, ignoring comments
@@ -113,7 +120,12 @@
             if ($items) {
                 $this->entityCurentState = $entity::class;
                 $neoxEncryptor?->setContent(json_encode($items, JSON_THROW_ON_ERROR | false, 512));
+                $this->neoxDoctrineTools->EventListenerPostFlush();
+                $this->neoxDoctrineTools->EventListenerPostUpdate();
                 $this->encryptor->entityManager->persist($neoxEncryptor);
+                $this->encryptor->entityManager->flush($neoxEncryptor);
+                $this->neoxDoctrineTools->EventListenerPostFlush(true);
+                $this->neoxDoctrineTools->EventListenerPostUpdate(true);
             }
 
             ++$this->neoxStats["wasaaaa"];

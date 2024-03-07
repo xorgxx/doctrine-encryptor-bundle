@@ -39,22 +39,20 @@
 
             if( $this->doctrineEncryptorService->encryptOFF() )
                 return;
-
+            
             if( DoctrineEncryptorService::isSupport( get_class( $entity ) ) ) {
-
-                if( DoctrineEncryptorService::isSupport( get_class( $entity ) ) ) {
-                    // Encrypt the fields of the entity | Perform encryption
-                    if( $this->doctrineEncryptorService->entityCurentState === "Decrypt" ) {
-                        $this->doctrineEncryptorService->decrypt( $entity, "onFlush" );
-                        $this->doctrineEncryptorService->entityCurentState = null;
-                        /**
-                         * TODO : not really sure to doing flush here is best practice ?
-                         * but i need to think about it !!
-                         */
-//                        $entityManager->flush();
-                    }
+                // Encrypt the fields of the entity | Perform encryption
+                if( $this->doctrineEncryptorService->entityCurentState === "Decrypt" ) {
+                    $this->doctrineEncryptorService->decrypt( $entity, "onFlush" );
+                    $this->doctrineEncryptorService->entityCurentState = null;
+                    /**
+                     * TODO : not really sure to doing flush here is best practice ?
+                     * but i need to think about it !!
+                     */
+                    //                        $entityManager->flush();
                 }
             }
+
         }
 
         /**
@@ -71,7 +69,8 @@
             $entity = $args->getObject();
 
             // turn off encryption
-            if( $this->doctrineEncryptorService->encryptOFF() )return;
+            if( $this->doctrineEncryptorService->encryptOFF() )
+                return;
 
             // Check if the entity needs to be decrypted
             if( DoctrineEncryptorService::isSupport( $entity::class ) ) {
@@ -96,7 +95,8 @@
             $entityManager = $postFlushEventArgs->getEntityManager();
 
             // turn off encryption
-            if( $this->doctrineEncryptorService->encryptOFF() ) return;
+            if( $this->doctrineEncryptorService->encryptOFF() )
+                return;
 
             // Iterate through the identity map and check if the entity needs to be decrypted
             foreach( $identityMap as $entityMap ) {
@@ -111,7 +111,7 @@
                              * TODO : not realy shur to doing flush here is best practice ?
                              * but i need to think about it !!
                              */
-                            $entityManager->flush($entity);
+                            $entityManager->flush( $entity );
 
                             // This is to return uncrypted value( to show front after create)
                             $this->doctrineEncryptorService->decrypt( $entity, "onFlush" );
@@ -148,7 +148,8 @@
             $entityManager = $onFlushEventArgs->getEntityManager();
 
             // turn off encryption
-            if( $this->doctrineEncryptorService->encryptOFF() ) return;
+            if( $this->doctrineEncryptorService->encryptOFF() )
+                return;
 
             // Iterate through the scheduled entity insertions
             foreach( $unitOfWork->getScheduledEntityInsertions() as $entity ) {

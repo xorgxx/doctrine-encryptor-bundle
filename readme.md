@@ -51,7 +51,7 @@ doctrine_encryptor.yaml file
 
 ## install openSSL .pem
 
-#### You may have to create manually folder : config/OpenSSL
+#### You may have to create manually folder : config/doctrine-encryptor
 
 Then : run ClI |-> php bin/console neox:encryptor:openssl follow instruction. 
 
