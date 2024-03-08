@@ -112,7 +112,8 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
   "john doe" <- decrypt (length:8)  / (length: +20!!) encrypt -> "MUIFAOpLp21iX1Dy2ZNkYbby6zo7ADYgVs-hGkNaWR2OF5AbQUMcBKZHigtFVxZiIFWyOTV8Ts-9q_pNAHBxCKcAPZNJjfPgVQglMLAKi0bZicmPlCQKJpRpX2k5IAjAqawOlFsPpD9KikIEFRhuy"
   
 ````
-**Now** you can start command (CLI) to encrypt/decrypt entity ... 
+ * **NO possibility to make index or search on field's crypted**
+ * **Now** you can start command (CLI) to encrypt/decrypt entity ... 
 
   * php bin/console neox:encryptor:wasaaaa
 
