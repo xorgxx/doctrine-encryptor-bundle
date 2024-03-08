@@ -20,6 +20,7 @@
         private bool   $force             = false;
         public mixed   $encryptor;
         public ?string $entityCurentState = null;
+ 
 
         public function __construct(readonly NeoxDoctrineFactory $neoxDoctrineFactory, readonly NeoxDoctrineTools $neoxDoctrineTools)
         {
@@ -83,16 +84,17 @@
          * @throws ReflectionException
          * @throws JsonException
          */
-        public function encrypt($entity, string $event, bool $force = false): void
+        public function encrypt($entity, string $event, bool $force = false): ?NeoxEncryptorEntity
         {
             $items       = [];
             $Reflections = $this->getReflection($entity);
 
+            /* @var ReflectionClass $Reflection */
+            
             foreach ($Reflections[$entity::class] as $Reflection) {
                 // process the value Encrypt/decrypt
                 $t       = serialize($Reflection->getValue());
                 $process = $this->encryptor->encrypt($t);
-
                 // get the value of the property
                 if( $Reflection->getAttributeProperty() === "in" ) {
                     // set the value of the property with the processed value in entity
@@ -112,23 +114,18 @@
                         $process = null;
                     }
                 }
-                // preUpdate source entity will be encrypted
+                // Set new value of the source entity will be encrypted
                 $Reflection->getProperty()->setValue($entity, $process);
 
             }
 
-            if ($items) {
+            if ( $items ) {
                 $this->entityCurentState = $entity::class;
                 $neoxEncryptor?->setContent(json_encode($items, JSON_THROW_ON_ERROR | false, 512));
-                $this->neoxDoctrineTools->EventListenerPostFlush();
-                $this->neoxDoctrineTools->EventListenerPostUpdate();
                 $this->encryptor->entityManager->persist($neoxEncryptor);
-                $this->encryptor->entityManager->flush($neoxEncryptor);
-                $this->neoxDoctrineTools->EventListenerPostFlush(true);
-                $this->neoxDoctrineTools->EventListenerPostUpdate(true);
+                return $neoxEncryptor;
             }
-
-            ++$this->neoxStats["wasaaaa"];
+            return null;
         }
 
         /**
@@ -193,7 +190,6 @@
                  **/
 
                 foreach ($Entity as $item) {
-                    $this->neoxStats["wasaaaa"] = 1;
                     if ($action === "Decrypt") {
                         ++$this->neoxStats["Decrypt"];
                         $this->entityCurentState = "Decrypt";
@@ -202,15 +198,19 @@
                         if ($neoxEncryptor->getid()) {
                             $this->encryptor->entityManager->remove($neoxEncryptor);
                         }
-
                     } else {
                         ++$this->neoxStats["Encrypt"];
-                        $this->encrypt($item, "convert", false);
-                        $this->encryptor->entityManager->persist($item);
-                        $this->entityCurentState = $item::class;
+                        $p = $this->encrypt($item, "convert", false);
                     }
+                    
+                    $this->neoxDoctrineTools->EventListenerAll();
+                    $this->neoxDoctrineTools->EventListenerOnFlush();
                     $this->encryptor->entityManager->flush();
+                    $this->neoxDoctrineTools->EventListenerAll(true);
+                    $this->neoxDoctrineTools->EventListenerOnFlush(true);
+                    
                 }
+       
             }
         }
 

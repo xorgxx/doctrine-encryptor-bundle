@@ -8,6 +8,7 @@
     use Doctrine\ORM\Event\OnFlushEventArgs;
     use Doctrine\ORM\Event\PostFlushEventArgs;
     use Doctrine\ORM\Event\PostUpdateEventArgs;
+    use Doctrine\ORM\Event\PrePersistEventArgs;
     use Doctrine\ORM\Events;
     use JsonException;
     use ReflectionException;
@@ -19,41 +20,16 @@
     #[AsDoctrineListener( event: Events::postLoad, priority: 500, connection: 'default' )]
     #[AsDoctrineListener( event: Events::postFlush, priority: 500, connection: 'default' )]
     #[AsDoctrineListener( event: Events::postUpdate, priority: 500, connection: 'default' )]
+    #[AsDoctrineListener( event: Events::prePersist, priority: 500, connection: 'default' )]
     class DoctrineEncryptorSubscriber
     {
+        private ?string $event = null;
+
         public function __construct( readonly DoctrineEncryptorService $doctrineEncryptorService )
         {
 
         }
 
-        /**
-         * !! THIS CODE IS USE FOR COMMAND LINE ONLY !!
-         *
-         * @throws ReflectionException
-         * @throws JsonException
-         */
-        public function postUpdate( PostUpdateEventArgs $args ): void
-        {
-            $entity        = $args->getObject();
-            $entityManager = $args->getObjectManager();
-
-            if( $this->doctrineEncryptorService->encryptOFF() )
-                return;
-            
-            if( DoctrineEncryptorService::isSupport( get_class( $entity ) ) ) {
-                // Encrypt the fields of the entity | Perform encryption
-                if( $this->doctrineEncryptorService->entityCurentState === "Decrypt" ) {
-                    $this->doctrineEncryptorService->decrypt( $entity, "onFlush" );
-                    $this->doctrineEncryptorService->entityCurentState = null;
-                    /**
-                     * TODO : not really sure to doing flush here is best practice ?
-                     * but i need to think about it !!
-                     */
-                    //                        $entityManager->flush();
-                }
-            }
-
-        }
 
         /**
          * Listens to the postLoad lifecycle event and decrypts entities' property values when loaded into the entity manager.
@@ -90,47 +66,37 @@
          */
         public function postFlush( PostFlushEventArgs $postFlushEventArgs ): void
         {
+
             // Get the identity map from the object manager
-            $identityMap   = $postFlushEventArgs->getObjectManager()->getUnitOfWork()->getIdentityMap();
+            $unitOfWork    = $postFlushEventArgs->getObjectManager()->getUnitOfWork();
             $entityManager = $postFlushEventArgs->getEntityManager();
 
             // turn off encryption
             if( $this->doctrineEncryptorService->encryptOFF() )
                 return;
 
+            $entities = array_merge( ...array_values( $unitOfWork->getIdentityMap() ) );
+
             // Iterate through the identity map and check if the entity needs to be decrypted
-            foreach( $identityMap as $entityMap ) {
-                foreach( $entityMap as $entity ) {
-                    if( DoctrineEncryptorService::isSupport( $entity::class ) ) {
-                        // Encrypt the fields of the entity | Perform encryption
-                        if( !$this->doctrineEncryptorService->neoxStats[ "wasaaaa" ] ) {
-                            $this->doctrineEncryptorService->encrypt( $entity, "onFlush" );
-                            $this->doctrineEncryptorService->neoxStats[ "wasaaaa" ] = true;
+            foreach( $entities as $entity ) {
+                if( DoctrineEncryptorService::isSupport( $entity::class ) ) {
+                    // Encrypt the fields of the entity | Perform encryption
+                    if( $this->event === "insert" ) {
+                        $this->event         = "pass";
+                        $neoxEncryptorEntity = $this->doctrineEncryptorService->encrypt( $entity, "onFlush" );
+                        $entityManager->persist( $entity );
+                        $entityManager->flush();
+                    }
 
-                            /**
-                             * TODO : not realy shur to doing flush here is best practice ?
-                             * but i need to think about it !!
-                             */
-                            $entityManager->flush( $entity );
-
-                            // This is to return uncrypted value( to show front after create)
-                            $this->doctrineEncryptorService->decrypt( $entity, "onFlush" );
-                        }
-
-                        /*
-                                                  // OLD CODE NOT REFACTORING !!!
-                                                  //Encrypt the fields of the entity | Perform encryption
-
-                                                  if ($this->doctrineEncryptorService->neoxStats["wasaaaa"]) continue;
-                                                  $this->doctrineEncryptorService->encrypt($entity, "onFlush");
-                                                  $entityManager->flush();
-                                                  // this is to return uncrypted value (to show front after create)
-                                                  $this->doctrineEncryptorService->decrypt($entity, "onFlush");
-                        */
-
+                    if( $this->event === "update" ) {
+                        $this->event         = "pass";
+                        // This is to return uncrypted value( to show front after create)
+                        $this->doctrineEncryptorService->decrypt( $entity, "onFlush" );
                     }
                 }
             }
+
+
         }
 
         /**
@@ -157,13 +123,20 @@
                 // Check if the entity is eligible for encryption
                 if( DoctrineEncryptorService::isSupport( $entity::class ) ) {
                     // Encrypt the fields of the entity | Perform encryption
+                    // inform that this is an insert to postFlush
+                    $this->event = "insert";
                 }
             }
 
             foreach( $unitOfWork->getScheduledEntityUpdates() as $entity ) {
                 // Check if the entity is eligible for encryption
-                if( DoctrineEncryptorService::isSupport( $entity::class ) ) {
-
+                if( DoctrineEncryptorService::isSupport( $entity::class ) && $this->event != "pass" && $this->doctrineEncryptorService->entityCurentState != "Decrypt") {
+                    $this->event         = "update";
+                    $neoxEncryptorEntity = $this->doctrineEncryptorService->encrypt( $entity, "onFlush" );
+                    $unitOfWork->recomputeSingleEntityChangeSet( $entityManager->getClassMetadata( get_class( $entity ) ), $entity );
+                    $entityManager->persist( $neoxEncryptorEntity );
+                    $unitOfWork->computeChangeSet( $entityManager->getClassMetadata( get_class( $neoxEncryptorEntity ) ), $neoxEncryptorEntity );
+                    $unitOfWork->recomputeSingleEntityChangeSet( $entityManager->getClassMetadata( get_class( $neoxEncryptorEntity ) ), $neoxEncryptorEntity );
                 }
             }
 
@@ -174,7 +147,39 @@
                     $this->doctrineEncryptorService->remove( $entity );
                 }
             }
+        }
 
+        /**
+         * !! THIS CODE NOOT USE !!
+         *
+         * @throws ReflectionException
+         * @throws JsonException
+         */
+        public function prePersist( PrePersistEventArgs $args ): void
+        {
+            $entity = $args->getObject();
+            if( $this->doctrineEncryptorService->encryptOFF() )
+                return;
+            if( DoctrineEncryptorService::isSupport( get_class( $entity ) ) ) {
+            }
+        }
 
+        /**
+         * !! THIS CODE NOOT USE !!
+         *
+         * @throws ReflectionException
+         * @throws JsonException
+         */
+        public function postUpdate( PostUpdateEventArgs $args ): void
+        {
+            $entity        = $args->getObject();
+            $entityManager = $args->getObjectManager();
+
+            if( $this->doctrineEncryptorService->encryptOFF() )
+                return;
+
+            if( DoctrineEncryptorService::isSupport( get_class( $entity ) ) ) {
+                // Encrypt the fields of the entity | Perform encryption
+            }
         }
     }
