@@ -135,15 +135,17 @@
         public function decrypt($entity, string $event, bool $force = false): void
         {
             $Reflections   = $this->getReflection($entity);
+            $this->neoxDoctrineTools->EventListenerAll();
             $neoxEncryptor = $this->encryptor->getEncryptorId($entity);
-
+            $this->neoxDoctrineTools->EventListenerAll(true);
+            
             foreach ($Reflections[$entity::class] as $Reflection) {
                 // process the value Encrypt/decrypt
                 $propertyValue = $Reflection->getValue();
                 $process       = $propertyValue;
                 if (OpenSSLTools::isBase64($propertyValue, $Reflection->getType())) {
                     $decryptedValue = $this->encryptor->decrypt($propertyValue);
-                    $process = $this->isSerialized($decryptedValue);
+                    $process = $this->isSerialized($decryptedValue) ? :$propertyValue;
                 }
 
                 if ($Reflection->getAttributeProperty() === "in") {

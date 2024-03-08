@@ -120,9 +120,14 @@
             
             return $directory;
         }
-        
+
         public static function isBase64( $string, mixed $type = null): bool
         {
+            if (base64_decode($string, true) === false)
+            {
+                return $string;
+            }
+
             $Halite = Halite::VERSION_PREFIX;
             // if it is already Encrypted then Decrypted
             if (is_string($string)  && preg_match("/^{$Halite}/", $string)) {
@@ -132,7 +137,7 @@
             if ($string === null) {
                 return false;
             }
-            
+
             $decodedString = false;
             if (is_string($string) && base64_decode($string, true) !== false) {
                 $decodedString = base64_decode($string, true);
