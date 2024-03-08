@@ -73,16 +73,19 @@
             $key           = new HiddenString( $key_hex );
             $encryptionKey = KeyFactory::deriveEncryptionKey( $key, substr( $key->getString(), 11, 16 ) );
             $message       = new HiddenString( $msg );
-            return [ $encryptionKey, $message ];
+            return [ $encryptionKey,
+                $message ];
         }
 
         public static function setBuildIndice( $entity ): string
         {
+            // Delete the namespace 'Proxies\__CG__\'
+            $className     = str_replace( 'Proxies\__CG__\\', '', $entity::class );
             $enc_key       = self::getEncryptionKey();
             $key_hex       = KeyFactory::export( $enc_key )->getString();
             $key           = new HiddenString( $key_hex );
-            $imput         = $entity::class . substr( $key->getString(), 15, 4 ) . $entity->getId();
+            $imput         = $className . substr( $key->getString(), 15, 4 ) . $entity->getId();
             $encryptionKey = KeyFactory::deriveEncryptionKey( $key, substr( $key->getString(), 11, 16 ) );
-            return Util::keyed_hash( $imput, $encryptionKey , 16);
+            return Util::keyed_hash( $imput, $encryptionKey, 16 );
         }
     }
