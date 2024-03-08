@@ -88,8 +88,8 @@
                         $entityManager->flush();
                     }
 
-                    if( $this->event === "update" ) {
-                        $this->event         = "pass";
+                    if (in_array($this->event, ["update", "insert", "pass"])) {
+                        $this->event         = null;
                         // This is to return uncrypted value( to show front after create)
                         $this->doctrineEncryptorService->decrypt( $entity, "onFlush" );
                     }
