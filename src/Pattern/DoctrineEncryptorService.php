@@ -8,6 +8,7 @@
     use JsonException;
     use ReflectionClass;
     use ReflectionException;
+    Use Doctrine\Persistence\Proxy;
 
     class DoctrineEncryptorService
     {
@@ -20,6 +21,8 @@
         private bool   $force             = false;
         public mixed   $encryptor;
         public ?string $entityCurentState = null;
+        public ?string $fieldCurentState  = null;
+
  
 
         public function __construct(readonly NeoxDoctrineFactory $neoxDoctrineFactory, readonly NeoxDoctrineTools $neoxDoctrineTools)
@@ -132,11 +135,11 @@
          * @throws ReflectionException
          * @throws JsonException
          */
-        public function decrypt($entity, string $event, bool $force = false): void
+        public function decrypt($entity, string$event, bool $force = false): void
         {
             $Reflections   = $this->getReflection($entity);
             $this->neoxDoctrineTools->EventListenerAll();
-            $neoxEncryptor = $this->encryptor->getEncryptorId($entity);
+            $neoxEncryptor  = $this->encryptor->getEncryptorId($entity);
             $this->neoxDoctrineTools->EventListenerAll(true);
             
             foreach ($Reflections[$entity::class] as $Reflection) {
@@ -159,9 +162,10 @@
                     $value        = isset($content->$propertyName);
                     $process      = $value ? $this->isSerialized($this->encryptor->decrypt($content->$propertyName)) : null;
                 }
+                ;
+                $this->fieldCurentState = $process;
                 $Reflection->getProperty()->setValue($entity, $process);
             }
-
         }
 
         /**
@@ -216,6 +220,25 @@
             }
         }
 
+        public function getTwigDecrypt($entity, string $action): string
+        {
+            // Delete the namespace 'Proxies\__CG__\'
+            $className = str_replace('Proxies\__CG__\\', '', $entity::class);
+
+            if( DoctrineEncryptorService::isSupport( $className ) ) {
+                $this->neoxDoctrineTools->EventListenerAll();
+                $neoxEncryptor  = $this->encryptor->getEncryptorId($entity);
+                $this->neoxDoctrineTools->EventListenerAll(true);
+
+                if ( $neoxEncryptor->getId()) {
+                    $propertyName = $action;
+                    $content      = json_decode($neoxEncryptor->getContent(), false, 512, JSON_THROW_ON_ERROR);
+                    $value        = isset($content->$propertyName);
+                    $process      = $value ? $this->isSerialized($this->encryptor->decrypt($content->$propertyName)) : null;
+                }
+            }
+            return $process;
+        }
         /**
          * @throws ReflectionException
          */

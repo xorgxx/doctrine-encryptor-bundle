@@ -101,10 +101,13 @@
         
         public static function builderIndice($entity): string
         {
+            // Delete the namespace 'Proxies\__CG__\'
+            $className = str_replace('Proxies\__CG__\\', '', $entity::class);
+            
             $directory  = dirname(__DIR__, 6) . self::PATH_FOLDER;
             $privateKey = $directory . self::PRIVATE_KEY;
             $publicKey  = $directory . self::PUBLIC_KEY;
-            $message    = $entity::class . substr($publicKey, 4, 4) . $entity->getId();
+            $message    = $className . substr($publicKey, 4, 4) . $entity->getId();
             return hash_hmac('gost-crypto', $message, $publicKey);
         }
         

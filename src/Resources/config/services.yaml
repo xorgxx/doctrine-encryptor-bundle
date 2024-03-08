@@ -33,3 +33,9 @@ services:
         #            - Doctrine\ORM\EntityManagerInterface
         #            - DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\NeoxDoctrineTools
         
+#        "DoctrineEncryptor.Service":
+#            public: true
+#            class:  DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\DoctrineEncryptorService
+#            arguments:
+#                - DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\NeoxDoctrineTools
+#                - DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\NeoxDoctrineTools

@@ -94,6 +94,12 @@ In entity, you want to secure field (data)
     }
   ....
 ````
+## TWIG 
+To manage on template twig to uncrypt field
+````
+  {{ health.profile* | doctrineDecrypt("firstName**") }}
+  first put entity* and the field** name to decrypt
+````
 
 ## Important !
 Consider the size / length of field you want to crypt when you chose "in" !! ex: length:20
