@@ -126,10 +126,6 @@
 
         public static function isBase64( $string, mixed $type = null): bool
         {
-            if (base64_decode($string, true) === false)
-            {
-                return $string;
-            }
 
             $Halite = Halite::VERSION_PREFIX;
             // if it is already Encrypted then Decrypted

@@ -104,6 +104,7 @@
             // loop through one/all entities to encrypt/decrypt
             if ($processing == "ALL") {
                 foreach ($EntitySupports as $entity) {
+                    $io->text("Entity : {$entity["entity"]} - Start processessing : {$action}. Wait it finished, can be longtime (~ 1.5 min / 100 )  ...");
                     if ($stats = $this->helperCommand->setEntityConvert($entity["entity"], $action)) {
                         $io->success("Entity : {$entity["entity"]} has been processed. - {$action}  / {$stats[$action]} ");
                     } else {
@@ -111,6 +112,7 @@
                     }
                 }
             } else {
+                $io->text("Entity : {$entity["entity"]} - Start processessing : {$action}. Wait it finished, can be longtime (~ 1.5 min / 100 )  ...");
                 if ($stats = $this->helperCommand->setEntityConvert($processing, $action)) {
                     $io->success("Entity : {$processing} has been processed. - {$action}  / {$stats[$action]} ");
                 } else {
