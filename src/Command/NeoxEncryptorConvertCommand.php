@@ -54,7 +54,9 @@
             $listeAlgos[]  = self::CANCEL;
             
             $CurrentEncryptor = $this->helperCommand->getCurrentEncryptor();
-            $io->info("Cureent encyptor is : " . $CurrentEncryptor);
+            $io->info("Cureent encyptor is  : " . $CurrentEncryptor);
+            $io->info("Time processing Halite   : ~ 2m for 100 records");
+            $io->info("Time processing openSS   : ~ 2s for 100 records");
             
             $listEncryptor      = $this->helperCommand->buildListeEncryptor($CurrentEncryptor);
             $switchEncryptor    = $this->askChoiceQuestion("Please choose ENCRYPTOR to switch to:", $listEncryptor, $input, $output);

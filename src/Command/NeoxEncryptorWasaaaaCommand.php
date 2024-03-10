@@ -57,14 +57,26 @@
             // foreach entity add it to list, to trait later
             // give back list of entities with properties to user "as status"
             foreach ($EntitySupports as $entityData) {
-                $io->title(sprintf('[Find in] Entity : %s ', $entityData['entity']));
+                $io->title(sprintf('[Find in] Entity : %s - %s line(s)', $entityData['entity'], $entityData['count']));
                 $io->text($entityData["properties"]);
                 $entity[] = $entityData['entity'];
             }
             
             $CurrentEncryptor = $this->helperCommand->getCurrentEncryptor();
-            $io->info("Cureent encyptor is : " . $CurrentEncryptor);
+            $io->newLine();
+            $h = $entityData['count'] * 0.008 * 60;
+            $o = $entityData['count'] * 0.0002 * 60;
             
+            $io->text([
+                "Current encyptor is : " . $CurrentEncryptor,
+                " - [INFO] Time processing -> Halite: ~ {$h}s ",
+                " - [INFO] Time processing -> OpenSSLSmc: ~ {$o}s "
+            ]);
+
+
+//            $io->info("Time processing Halite   : ~ 2m for 100 records");
+//            $io->info("Time processing openSS   : ~ 2s for 100 records");
+
             // Ask user which entity should be moved.
 //            $question       = new ChoiceQuestion("Please choose the ENTITY you want work on:", $entity);
 //            $question->setErrorMessage('ENTITY : %s does not exist.');
@@ -103,16 +115,16 @@
             
             // loop through one/all entities to encrypt/decrypt
             if ($processing == "ALL") {
-                foreach ($EntitySupports as $entity) {
-                    $io->text("Entity : {$entity["entity"]} - Start processessing : {$action}. Wait it finished, can be longtime (~ 1.5 min / 100 )  ...");
-                    if ($stats = $this->helperCommand->setEntityConvert($entity["entity"], $action)) {
-                        $io->success("Entity : {$entity["entity"]} has been processed. - {$action}  / {$stats[$action]} ");
+                foreach ($EntitySupports as $key => $entity) {
+                    $io->text("Entity : {$key} - Start processing : {$action}. Wait it finished, can be longtime (~ 1.5 min / 100 )  ...");
+                    if ($stats = $this->helperCommand->setEntityConvert($key, $action)) {
+                        $io->success("Entity : {$key} has been processed. - {$action}  / {$stats[$action]} ");
                     } else {
-                        $io->warning("Entity : {$entity["entity"]} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} ");
+                        $io->warning("Entity : {$key} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} ");
                     }
                 }
             } else {
-                $io->text("Entity : {$entity["entity"]} - Start processessing : {$action}. Wait it finished, can be longtime (~ 1.5 min / 100 )  ...");
+                $io->text("Entity : {$key} - Start processing : {$action}. Wait it finished, can be longtime (~ 1.5 min / 100 )  ...");
                 if ($stats = $this->helperCommand->setEntityConvert($processing, $action)) {
                     $io->success("Entity : {$processing} has been processed. - {$action}  / {$stats[$action]} ");
                 } else {
