@@ -126,9 +126,9 @@
             } else {
                 $io->text("Entity : {$key} - Start processing : {$action}. Wait it finished, can be longtime (~ 1.5 min / 100 )  ...");
                 if ($stats = $this->helperCommand->setEntityConvert($processing, $action)) {
-                    $io->success("Entity : {$processing} has been processed. - {$action}  / {$stats[$action]} ");
+                    $io->success("Entity : {$processing} has been processed. - {$action}  / {$stats[$action]} (Field's) ");
                 } else {
-                    $io->warning("Entity : {$processing} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} ");
+                    $io->warning("Entity : {$processing} has not been processed. {$stats["Decrypt"]} / {$stats["Encrypt"]} (Field's) ");
                 }
             }
             

@@ -9,6 +9,9 @@
     
     class NeoxDoctrineTools
     {
+        public array   $neoxStats         = [ "wasaaaa" => 0,
+                                              "Encrypt" => 0,
+                                              "Decrypt" => 0, ];
         private EventManager $eventManager;
         
         public function __construct(readonly ManagerRegistry $doctrine)
@@ -54,5 +57,15 @@
         public function getAction(bool $status): string
         {
             return $status ? 'addEventListener' : 'removeEventListener';
+        }
+        
+        public function setCountEncrypt( $int = 0): int{
+            $this->neoxStats["Encrypt"] += $int;
+            return $this->neoxStats["Encrypt"];
+        }
+
+        public function setCountDecrypt( $int = 0): int{
+            $this->neoxStats["Decrypt"] += $int;
+            return $this->neoxStats["Decrypt"];
         }
     }

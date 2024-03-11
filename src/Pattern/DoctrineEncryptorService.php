@@ -13,9 +13,9 @@
     class DoctrineEncryptorService
     {
         public array   $encryptors        = [];
-        public array   $neoxStats         = [ "wasaaaa" => 0,
-                                              "Encrypt" => 0,
-                                              "Decrypt" => 0, ];
+//        public array   $neoxStats         = [ "wasaaaa" => 0,
+//                                              "Encrypt" => 0,
+//                                              "Decrypt" => 0, ];
         private bool   $force             = false;
         public mixed   $encryptor;
         public ?string $entityCurentState = null;
@@ -92,6 +92,7 @@
 
             foreach( $Reflections[ $entity::class ] as $Reflection ) {
                 // process the value Encrypt/decrypt
+                if ($Reflection->getValue() === null) continue;
                 $t       = serialize( $Reflection->getValue() );
                 $process = $this->encryptor->encrypt( $t );
                 // get the value of the property
@@ -180,9 +181,9 @@
          */
         public function setEntityConvert( $entity, string $action ): void
         {
-            $this->neoxStats[ "wasaaaa" ] = 0; //-> Yes i know ! feel strange but we need this !!
-            $this->neoxStats[ "Decrypt" ] = 0;
-            $this->neoxStats[ "Encrypt" ] = 0;
+            $this->neoxDoctrineTools->neoxStats[ "wasaaaa" ] = 0; //-> Yes i know ! feel strange but we need this !!
+            $this->neoxDoctrineTools->neoxStats[ "Decrypt" ] = 0;
+            $this->neoxDoctrineTools->neoxStats[ "Encrypt" ] = 0;
             if( $Entity = $this->encryptor->entityManager->getRepository( $entity )->findall() ) {
 
                 /**
@@ -192,7 +193,7 @@
 
                 foreach( $Entity as $item ) {
                     if( $action === "Decrypt" ) {
-                        ++$this->neoxStats[ "Decrypt" ];
+//                        ++$this->neoxStats[ "Decrypt" ];
                         $this->entityCurentState = "Decrypt";
                         // check if property is encrypted in NeoxEncryptor if yes delete
                         $neoxEncryptor = $this->encryptor->getEncryptorId( $item );
@@ -200,11 +201,10 @@
                             $this->encryptor->entityManager->remove( $neoxEncryptor );
                         }
                     } else {
-                        ++$this->neoxStats[ "Encrypt" ];
+//                        ++$this->neoxStats[ "Encrypt" ];
                         $p = $this->encrypt( $item, "convert", false );
                     }
                 }
-
                 $this->neoxDoctrineTools->EventListenerAll();
                 $this->neoxDoctrineTools->EventListenerOnFlush();
                 $this->encryptor->entityManager->flush();
@@ -212,6 +212,7 @@
                 $this->neoxDoctrineTools->EventListenerOnFlush( true );
 
             }
+
         }
 
         public function getTwigDecrypt( $entity, string $action ): string

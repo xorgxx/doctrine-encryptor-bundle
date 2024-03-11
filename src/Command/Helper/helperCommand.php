@@ -74,7 +74,7 @@
         public function setEntityConvert( $Entity, $Action ): array
         {
             $this->doctrineEncryptorService->setEntityConvert( $Entity, $Action );
-            return $this->doctrineEncryptorService->neoxStats;
+            return $this->doctrineEncryptorService->neoxDoctrineTools->neoxStats;
         }
 
         public function getCurrentEncryptor(): string
