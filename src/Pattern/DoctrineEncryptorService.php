@@ -224,11 +224,17 @@
                 $neoxEncryptor = $this->encryptor->getEncryptorId( $entity );
                 $this->neoxDoctrineTools->EventListenerAll( true );
 
-                if( $neoxEncryptor->getId() ) {
+//                if( $neoxEncryptor->getId() ) {
+//                    $propertyName = $action;
+//                    $content      = json_decode( $neoxEncryptor->getContent(), false, 512, JSON_THROW_ON_ERROR );
+//                    $value        = isset( $content->$propertyName );
+//                    $process      = $value ? $this->isSerialized( $this->encryptor->decrypt( $content->$propertyName ) ) : null;
+//                }
+                if ($neoxEncryptor->getId()) {
                     $propertyName = $action;
                     $content      = json_decode( $neoxEncryptor->getContent(), false, 512, JSON_THROW_ON_ERROR );
-                    $value        = isset( $content->$propertyName );
-                    $process      = $value ? $this->isSerialized( $this->encryptor->decrypt( $content->$propertyName ) ) : null;
+                    $value        = $content->$propertyName ?? null;
+                    $process      = $value ? $this->isSerialized( $this->encryptor->decrypt( $value ) ) : null;
                 }
             }
             return $process;
@@ -246,8 +252,8 @@
             // https://www.php.net/manual/fr/reflectionclass.getattributes.php
             $neoxEncryptorProperties = array_filter(
                 $reflectorName->getProperties(), function( $property ) {
-                return count( $property->getAttributes( neoxEncryptor::class ) ) > 0;
-            }
+                    return count( $property->getAttributes( neoxEncryptor::class ) ) > 0;
+                }
             );
 
             foreach( $neoxEncryptorProperties as $property ) {
@@ -277,11 +283,15 @@
 
         public function isSerialized( $data )
         {
-            $unserializedData = @unserialize( $data ); //
-            if( $unserializedData !== false && ( is_array( $unserializedData ) || is_object( $unserializedData ) ) ) {
-                return $unserializedData;
-            }
-            return !$unserializedData ? $data : $unserializedData;
+            
+//            $unserializedData = @unserialize( $data ); //
+//            if( $unserializedData !== false && ( is_array( $unserializedData ) || is_object( $unserializedData ) ) ) {
+//                return $unserializedData;
+//            }
+//            $p = !$unserializedData ? $data : $unserializedData;
+
+
+            return ($unserializedData = @unserialize($data)) !== false ? $unserializedData : $data;
         }
 
     }

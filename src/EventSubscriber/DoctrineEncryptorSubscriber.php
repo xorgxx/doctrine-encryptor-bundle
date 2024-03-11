@@ -23,7 +23,11 @@
     #[AsDoctrineListener( event: Events::prePersist, priority: 500, connection: 'default' )]
     class DoctrineEncryptorSubscriber
     {
-        private ?string $event = null;
+        private ?array $event = [
+            "action"    => null,
+            "class"
+        ];
+
 
         public function __construct( readonly DoctrineEncryptorService $doctrineEncryptorService )
         {
@@ -81,21 +85,25 @@
             foreach( $entities as $entity ) {
                 if( DoctrineEncryptorService::isSupport( $entity::class ) ) {
                     // Encrypt the fields of the entity | Perform encryption
-                    if( $this->event === "insert" ) {
-                        $this->event         = "pass";
+
+                    if( $this->event["class"] === $entity::class && $this->event["action"] === "insert" ) {
+                        $this->event["action"]          = "insert";
+                        $this->event["class"]           = "null";
                         $neoxEncryptorEntity = $this->doctrineEncryptorService->encrypt( $entity, "onFlush" );
                         $entityManager->persist( $entity );
                         $entityManager->flush();
                     }
 
-                    if (in_array($this->event, ["update", "insert", "pass"])) {
-                        $this->event         = null;
+                    if (in_array($this->event["action"], ["update", "insert", "pass"])) {
+//                        $this->event         = null;
                         // This is to return uncrypted value( to show front after create)
                         $this->doctrineEncryptorService->decrypt( $entity, "onFlush" );
                     }
                 }
             }
 
+            $this->event["action"]          = "pass";
+            $this->event["class"]           = "null";
 
         }
 
@@ -124,14 +132,16 @@
                 if( DoctrineEncryptorService::isSupport( $entity::class ) ) {
                     // Encrypt the fields of the entity | Perform encryption
                     // inform that this is an insert to postFlush
-                    $this->event = "insert";
+                    $this->event["action"]  = "insert";
+                    $this->event["class"]   = $entity::class;
                 }
             }
 
             foreach( $unitOfWork->getScheduledEntityUpdates() as $entity ) {
                 // Check if the entity is eligible for encryption
-                if( DoctrineEncryptorService::isSupport( $entity::class ) && $this->event != "pass" && $this->doctrineEncryptorService->entityCurentState != "Decrypt") {
-                    $this->event         = "update";
+                if( DoctrineEncryptorService::isSupport( $entity::class ) && $this->event["action"] != "insert" && $this->doctrineEncryptorService->entityCurentState != "Decrypt") {
+                    $this->event["action"]          = "update";
+                    $this->event["class"]           = null;
                     $neoxEncryptorEntity = $this->doctrineEncryptorService->encrypt( $entity, "onFlush" );
                     $unitOfWork->recomputeSingleEntityChangeSet( $entityManager->getClassMetadata( get_class( $entity ) ), $entity );
                     $entityManager->persist( $neoxEncryptorEntity );
