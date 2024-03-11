@@ -5,6 +5,7 @@
     use Doctrine\ORM\EntityManagerInterface;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Entity\NeoxEncryptor;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\EncryptorInterface;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\NeoxDoctrineTools;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLTools;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\Halite\HaliteTools;
     use ParagonIE\Halite\Alerts\CannotPerformOperation;
@@ -26,7 +27,7 @@
     class HaliteEncryptor implements EncryptorInterface
     {
 
-        public function __construct( private readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager )
+        public function __construct( private readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools )
         {
         }
 
@@ -48,7 +49,8 @@
                 [ $encryptionKey,
                     $message ] = HaliteTools::setEncryptionKey( $field );
                 //                [$encryptionKey, $message] = $this->getEncryptionKey($field);
-                return Crypto::encrypt( $message, $encryptionKey );
+                $this->neoxDoctrineTools->setCountEncrypt(1);
+                return Crypto::encrypt( $message, $encryptionKey, Halite::ENCODE_BASE64 );
             }
             return $field;
         }
@@ -72,7 +74,8 @@
                 [ $encryptionKey,
                     $message ] = HaliteTools::setEncryptionKey( $field );
                 //                [$encryptionKey, $message] = $this->getEncryptionKey($field);
-                return Crypto::decrypt( $message->getString(), $encryptionKey )->getString();
+                $this->neoxDoctrineTools->setCountDecrypt(1);
+                return Crypto::decrypt( $message->getString(), $encryptionKey, Halite::ENCODE_BASE64 )->getString();
             }
             return $field;
         }

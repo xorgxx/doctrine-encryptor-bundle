@@ -34,6 +34,7 @@
 //            if ( !OpenSSLTools::isCrypted($plainText) ) {
             $secret     = $this->getEncryptionKey();
             $cipherText = openssl_public_encrypt($plainText, $encryptedMessage, $secret["publicKey"]);
+            $this->neoxDoctrineTools->setCountEncrypt(($cipherText ? 1 : 0  ));
             $plainText  = base64_Encode($encryptedMessage);
             
             if (!$encryptedMessage) {
@@ -60,6 +61,7 @@
             $secret     = $this->getEncryptionKey();
             $cipherText = base64_decode($plainText);
             openssl_private_decrypt($cipherText, $decryptedMessage, $secret["privateKey"]);
+            $this->neoxDoctrineTools->setCountDecrypt(($cipherText ? 1 : 0  ));
             $plainText = $decryptedMessage ?? $plainText;
 //            }
             return $plainText;
