@@ -98,12 +98,15 @@
             // ff5d400f96d533dfda3018dc7dce45f5
             //            $indice = OpenSSLTools::builderIndice($entity); b097f088794521e49a6d52385d75456c
             //            $indice = HaliteTools::setBuildIndice( $entity );
-            $indice = OpenSSLTools::builderIndice( $entity );
-            if( !$encryptor = $this->entityManager->getRepository( NeoxEncryptor::class )->findOneBy( [ 'data' => $indice ] ) ) {
-                $encryptor = new NeoxEncryptor();
-                $encryptor->setData( $indice );
-            };
+            $indice     = OpenSSLTools::builderIndice($entity);
+            return $this->entityManager->getRepository(NeoxEncryptor::class)->findOneBy(['data' => $indice]) ?: (new NeoxEncryptor())->setData($indice);
 
-            return $encryptor;
+            //            $indice = OpenSSLTools::builderIndice( $entity );
+//            if( !$encryptor = $this->entityManager->getRepository( NeoxEncryptor::class )->findOneBy( [ 'data' => $indice ] ) ) {
+//                $encryptor = new NeoxEncryptor();
+//                $encryptor->setData( $indice );
+//            };
+//
+//            return $encryptor;
         }
     }
