@@ -27,6 +27,7 @@ Install the bundle for Composer !! as is still on a beta version !!
   composer require paragonie/halite
 ````
 
+## Config file
 doctrine_encryptor.yaml file
 ````
   doctrine_encryptor:
@@ -36,24 +37,29 @@ doctrine_encryptor.yaml file
     encryptor_cipherAlgorithm: AES-256-CBC  # AES-256-CBC | !!! Camellia-256-CBC !!!
     encryptor_system: halite # halite | openSSLSym | !!! openSSLAsym !!! (das not support advance typing (obejt, array, ...) yet) 
   
-    ** openSSLSym is match faster !! | openSSLAsym because is Asymetric we cant put macth data in encrypte SO it's not working well yet!!
-    🚨 Due to instability issues (after ~100 caractes), it is advisable not to use the openSSLAsym encryptor for handling advanced data typing (obejt, array, ...).!!
-    ````
-[Cipher Algorithm list](Doc/cipherAlgorithm.md)
 
-[Encryptor list](Doc/encryptor
+````   
+    /** 
+    * ===== openSSLSym is match faster !! | ======
+    * openSSLAsym because is Asymetric we cant put macth data in encrypte SO it's not working well yet!!
+    * 🚨 Due to instability issues (after ~100 caractes), it is advisable not to use 
+    * the openSSLAsym encryptor for handling advanced data typing (obejt, array, ...).!!
+    **/
 
+* [Cipher Algorithm list](Doc/cipherAlgorithm.md)
+* [Encryptor list](Doc/encryptor)
+
+## Doctrine migrations
 🚨 You will have to make migration to add NeoxEncryptor in your entities. 🚨
 ````
   symfony make:migration
   symfony doctrine:migrations:migrate
 ````
 
-## install openSSL .pem
+## Creation .pem & .key
 
-#### You may have to create manually folder : config/doctrine-encryptor
-
-Then : run ClI |-> php bin/console neox:encryptor:openssl follow instruction. 
+* You may have to create manually folder : config/doctrine-encryptor
+* php bin/console neox:encryptor:openssl follow instruction. 
 
 
 **NOTE:** _You may need to use [ symfony composer dump-autoload ] to reload autoloading_
@@ -75,10 +81,11 @@ In entity, you want to secure field (data)
     #[neoxEncryptor(build: "in")]
     private ?string $description = null;
   
-  ** note that by default #[neoxEncryptor] 
+  /** =======   note that by default #[neoxEncryptor] 
   * Attribute : build: "in". be default  in / out
   * Attribute : facker: PhoneFacker::class. be default This give possibility to customize the "facker" for ex: type phoneNumber it's not buildin bundle, but hee you can make service.
-
+  **/
+  
   <?php
     namespace App\Services;
     use libphonenumber\PhoneNumber;
@@ -95,10 +102,10 @@ In entity, you want to secure field (data)
   ....
 ````
 ## TWIG 
-To manage on template twig to uncrypt field
+To manage on template twig to decrypt field
 ````
-  {{ health.profile* | doctrineDecrypt("firstName**") }}
-  first put entity* and the field** name to decrypt
+  {{ health.profile | doctrineDecrypt("firstName") }}
+  first put entity and the field name to decrypt
 ````
 
 ## Important !
@@ -112,15 +119,21 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
   "john doe" <- decrypt (length:8)  / (length: +20!!) encrypt -> "MUIFAOpLp21iX1Dy2ZNkYbby6zo7ADYgVs-hGkNaWR2OF5AbQUMcBKZHigtFVxZiIFWyOTV8Ts-9q_pNAHBxCKcAPZNJjfPgVQglMLAKi0bZicmPlCQKJpRpX2k5IAjAqawOlFsPpD9KikIEFRhuy"
   
 ````
- * **NO possibility to make index or search on field's crypted**
- * **Now** you can start command (CLI) to encrypt/decrypt entity ... 
+## Beware !!
+  * **NO possibility to make index or search on field's encrypted**
+## 🚨 🚨 Danger 🚨🚨
+**!!! Before you change anything key, attribute "in"/"out" ... !!!**
+1. Decrypt all before
+2. Change what you want ex: attribute from "in" to "out"
+3. Encrypt ALL
 
-  * php bin/console neox:encryptor:wasaaaa
+## [CLI] Command build-in
+  * php bin/console neox:encryptor:wasaaaa // command line to crypt/decrypt
+  * php bin/console neox:encryptor:openSSL // command to create .pem & .key
+  * php bin/console neox:encryptor:switch  // command to switch to new encryptor: ex: halite to openSSLSym
+  * php bin/console neox:encryptor:renew   // command to change all .pem & .key files. mainly to change cryptage. 
 
- **Say hello to new command** `php bin/console neox:encryptor:switch` this will process switch to new encryptor: ex: halite to openSSLSym 
-
-####  Process automatique will do this : ex: halite to openSSLSym
-
+####  For exemple | php bin/console neox:encryptor:switch | Process automatique will do this : ex: halite to openSSLSym
 * Decrypt all with the current encryptor halite
 * Modify in doctrine_encryptor.yaml |-> encryptor_system: halite >>> openSSLSym
 * Clear the cache 
@@ -128,13 +141,9 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
 
 ## <a href="https://www.google.com/search?client=firefox-b-d&q=wasaaa" target="_blank"> !! ??? WASAAAA ? 😉</a>
 
-Now if you encrypt or decrypt much time, it will just be crypt or decrypt much time. Data will still be manage.
+❔Now if you encrypt or decrypt much time, it will just be crypt or decrypt much time. Data will still be manage.
 
-## 🚨 🚨 Danger 🚨🚨
-**!!! Now if you change salt or pws !!!**
-1.  Decrypt all before 
-2.  Change salt / pws / attribute "in"/"out" ...
-3.  Encrypt ALL
+
 
 
 ## Tools power
