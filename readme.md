@@ -80,27 +80,43 @@ In entity, you want to secure field (data)
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[neoxEncryptor(build: "in")]
     private ?string $description = null;
-  
-  /** =======   note that by default #[neoxEncryptor] 
-  * Attribute : build: "in". be default  in / out
-  * Attribute : facker: PhoneFacker::class. be default This give possibility to customize the "facker" for ex: type phoneNumber it's not buildin bundle, but hee you can make service.
-  **/
-  
-  <?php
-    namespace App\Services;
-    use libphonenumber\PhoneNumber;
-    class PhoneFacker implements neoxFackerInterface
-    {
-        public function create( ): PhoneNumber
-        {
-            return  (new PhoneNumber())
-                ->setCountryCode(33)
-                ->setNationalNumber("14155552671")
-            ;
-        }
-    }
+ 
+    
+    /** =======   note that by default #[neoxEncryptor] 
+    * Attribute : build: "in". be default  in / out
+    * Attribute : facker: PhoneFacker::class. be default This give possibility to customize the "facker" for ex: type phoneNumber it's not buildin bundle, but hee you can make service.
+    **/
+ 
   ....
 ````
+## Custom facker 
+This is special to manage typing and want to be shown in a database.
+Most of the attributes are recognized be the bundle string, int, date ...., But in some cas as PhoneNumber, [...] bundle will not recognized! So you will need to add service.
+
+````
+    <?php
+      namespace App\Services;
+      use libphonenumber\PhoneNumber;
+      class PhoneFacker implements neoxFackerInterface
+      {
+          public function create( ): PhoneNumber
+          {
+              return  (new PhoneNumber())
+                  ->setCountryCode(33)
+                  ->setNationalNumber("14155552671")
+              ;
+          }
+      }
+````
+Then is Entity file add attribute [facker: PhoneFacker::class] 
+````
+    #[AssertPhoneNumber(type: [AssertPhoneNumber::MOBILE], defaultRegion: 'FR')]
+    #[ORM\Column(type: "phone_number", nullable: true)]
+    #[neoxEncryptor(build: "out", facker: PhoneFacker::class)]
+    private ?PhoneNumber $phoneNumber = null;
+    
+````
+
 ## TWIG 
 To manage on template twig to decrypt field
 ````
