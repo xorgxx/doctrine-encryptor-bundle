@@ -44,9 +44,11 @@
          * SEED-CBC : IV de 16 octets
          */
         private string $cipherAlgorithm = 'Camellia-256-CBC';
-        
+        private array  $secret;
+
         public function __construct(readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools)
         {
+            $this->secret = $this->getEncryptionKey();
         }
         
         /**
@@ -57,8 +59,8 @@
         public function encrypt($plainText): string
         {
 //            if (OpenSSLTools::isBase64($plainText)) {
-            $secret     = $this->getEncryptionKey();
-            $cipherText = openssl_encrypt($plainText, $this->cipherAlgorithm, $secret['pws'], OPENSSL_RAW_DATA, $secret['iv']);
+//            $secret     = $this->getEncryptionKey();
+            $cipherText = openssl_encrypt($plainText, $this->cipherAlgorithm, $this->secret['pws'], OPENSSL_RAW_DATA, $this->secret['iv']);
             $this->neoxDoctrineTools->setCountEncrypt(($cipherText ? 1 : 0  ));
             $plainText  = base64_Encode($cipherText);
            
@@ -77,9 +79,9 @@
         public function decrypt($plainText): string
         {
 //            if (OpenSSLTools::isBase64($plainText)) {
-            $secret     = $this->getEncryptionKey();
+//            $secret     = $this->getEncryptionKey();
             $cipherText = base64_decode($plainText);
-            $plainText  = openssl_decrypt($cipherText, $this->cipherAlgorithm, $secret['pws'], OPENSSL_RAW_DATA, $secret['iv']);
+            $plainText  = openssl_decrypt($cipherText, $this->cipherAlgorithm, $this->secret['pws'], OPENSSL_RAW_DATA, $this->secret['iv']);
             $this->neoxDoctrineTools->setCountDecrypt(($cipherText? 1 : 0  ));
             //            }
             return $plainText;

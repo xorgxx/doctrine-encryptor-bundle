@@ -48,18 +48,27 @@
                     );
 
                     if( !empty( $neoxEncryptorAttributes ) ) {
-                        // Get the necessary information from the neoxEncryptor attribute
-                        $buildIn      = $neoxEncryptorAttributes[ 1 ]->newInstance()->build;
-                        $fieldMapping = $classMetadata->getFieldMapping( $property );
-                        $type         = $fieldMapping[ 'type' ] ?? null;
-                        $length       = isset( $fieldMapping[ 'length' ] ) ? ' - ' . $fieldMapping[ 'length' ] : '';
+                        $firstAttribute = reset($neoxEncryptorAttributes);
+                        if ($firstAttribute !== false) {
+                            // strange but it will be away one item but index can be 1, 2, 3 ...
+                            // so we have to find good one 
+                            foreach ($neoxEncryptorAttributes as $attribute) {
+                                // Get the necessary information from the neoxEncryptor attribute
+                                $buildIn      = $attribute->newInstance()->build;
+                                $fieldMapping = $classMetadata->getFieldMapping( $property );
+                                $type         = $fieldMapping[ 'type' ] ?? null;
+                                $length       = isset( $fieldMapping[ 'length' ] ) ? ' - ' . $fieldMapping[ 'length' ] : '';
 
-                        // Add properties to the property list
-                        $propertiesList[]                  = $type ? sprintf( '   Encryptor : %s - Property : %s ( %s%s ) ', $buildIn, $property, $type, $length ) : $property;
-                        $o                                 = $this->getCountEntity( $entityName );
-                        $this->entityStatus[ $entityName ] = [ 'entity'     => $entityName,
-                                                               'count'      => $o,
-                                                               'properties' => $propertiesList, ];
+                                // Add properties to the property list
+                                $propertiesList[]                  = $type ? sprintf( '   Encryptor : %s - Property : %s ( %s%s ) ', $buildIn, $property, $type, $length ) : $property;
+                                $o                                 = $this->getCountEntity( $entityName );
+                                $this->entityStatus[ $entityName ] = [ 'entity'     => $entityName,
+                                                                       'count'      => $o,
+                                                                       'properties' => $propertiesList, ];  
+                                break; // Sortir de la boucle après avoir trouvé le premier élément
+                            }
+
+                        }
                     }
                 }
             }

@@ -36,7 +36,6 @@
 
         /**
          * @throws ReflectionException
-         * @throws \JsonException
          */
         public function doctrineDecrypt(mixed $entity, string $field): string
         {

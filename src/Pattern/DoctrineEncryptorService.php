@@ -159,7 +159,7 @@
                     $value        = isset( $content->$propertyName );
                     $process      = $value ? $this->isSerialized( $this->encryptor->decrypt( $content->$propertyName ) ) : $Reflection->getValue();
                 };
-//                $this->fieldCurentState = $process; ?? dont remember where for what !!
+//                $this->fieldCurentState = $process;
                 $Reflection->getProperty()->setValue( $entity, $process );
             }
         }
@@ -215,10 +215,6 @@
 
         }
 
-        /**
-         * @throws ReflectionException
-         * @throws JsonException
-         */
         public function getTwigDecrypt( $entity, string $action ): string
         {
             // Delete the namespace 'Proxies\__CG__\'

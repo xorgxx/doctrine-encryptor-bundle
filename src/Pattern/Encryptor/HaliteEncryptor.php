@@ -26,9 +26,11 @@
 
     class HaliteEncryptor implements EncryptorInterface
     {
-
+        private array  $secret;
+        
         public function __construct( private readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools )
         {
+            $this->secret = $this->getEncryptionKey();
         }
 
         /**
