@@ -13,7 +13,7 @@ Protection Regulation (GDPR).
 
 [![Doctrineencryptor-schema.png](https://i.postimg.cc/NG408N8j/Doctrineencryptor-schema.png)](https://postimg.cc/0rzxP0HT)
 
-## Installation BETA VERSION !!
+## Installation DEV-MASTER VERSION is not stable yet ! to use as sandBox !!
 
 Install the bundle for Composer !! as is still on a beta version !!
 
