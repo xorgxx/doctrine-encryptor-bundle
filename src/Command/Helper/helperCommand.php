@@ -146,7 +146,6 @@
         public function buildListeEncryptor( $excludedItem ): array
         {
             $listEncryptor = [ "Halite (halite)",
-                "openSSLAsymmetric (openSSLAsym)",
                 "openSSLSymmetric (openSSLSym)" ];
 
             return array_filter( $listEncryptor, function( $item ) use ( $excludedItem ) {
@@ -156,7 +155,6 @@
 
         private function getCountEntity( $entity ): int
         {
-
             $entityManager = $this->doctrine->getManager();
             $repository    = $entityManager->getRepository( $entity );
             $count         = $repository->createQueryBuilder( 'e' )->select( 'COUNT(e.id)' ) // Supposons que 'id' est le nom de votre colonne ID

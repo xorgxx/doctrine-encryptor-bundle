@@ -44,12 +44,9 @@
          * SEED-CBC : IV de 16 octets
          */
         private string $cipherAlgorithm = 'Camellia-256-CBC';
-        private array  $secret;
 
         public function __construct(readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools)
-        {
-            $this->secret = $this->getEncryptionKey();
-        }
+        {}
         
         /**
          * @param string $plainText
@@ -58,13 +55,10 @@
          */
         public function encrypt($plainText): string
         {
-//            if (OpenSSLTools::isBase64($plainText)) {
-//            $secret     = $this->getEncryptionKey();
-            $cipherText = openssl_encrypt($plainText, $this->cipherAlgorithm, $this->secret['pws'], OPENSSL_RAW_DATA, $this->secret['iv']);
+            $cipherText = openssl_encrypt($plainText, $this->cipherAlgorithm, openSSLTools::getSecretBin(), OPENSSL_RAW_DATA, openSSlTools::getIv($this->cipherAlgorithm));
             $this->neoxDoctrineTools->setCountEncrypt(($cipherText ? 1 : 0  ));
             $plainText  = base64_Encode($cipherText);
-           
-//            }
+
             if (!$cipherText) {
                 throw new \Exception("Unable to encrypt message. {$plainText} - is this string !?? (knowladge issue).  Your data havent been encrypted.");
             }
@@ -78,12 +72,9 @@
          */
         public function decrypt($plainText): string
         {
-//            if (OpenSSLTools::isBase64($plainText)) {
-//            $secret     = $this->getEncryptionKey();
             $cipherText = base64_decode($plainText);
-            $plainText  = openssl_decrypt($cipherText, $this->cipherAlgorithm, $this->secret['pws'], OPENSSL_RAW_DATA, $this->secret['iv']);
+            $plainText  = openssl_decrypt($cipherText, $this->cipherAlgorithm, openSSLTools::getSecretBin(), OPENSSL_RAW_DATA, openSSlTools::getIv($this->cipherAlgorithm));
             $this->neoxDoctrineTools->setCountDecrypt(($cipherText? 1 : 0  ));
-            //            }
             return $plainText;
         }
         
@@ -94,12 +85,7 @@
          */
         public function getEncryptionKey(string $msg = ""): array
         {
-            $secret               = OpenSSLTools::getPwsSalt();
-            $ivLength             = openssl_cipher_iv_length($this->cipherAlgorithm);
-            $EncryptionKey["iv"]  = substr($secret['salt'], 0, $ivLength);
-            $EncryptionKey["pws"] = substr($secret['pws'], 0, 32);
-            
-            return $EncryptionKey;
+            // .....
         }
         
         /**
@@ -112,13 +98,5 @@
             // ff5d400f96d533dfda3018dc7dce45f5
             $indice     = OpenSSLTools::builderIndice($entity);
             return $this->entityManager->getRepository(NeoxEncryptor::class)->findOneBy(['data' => $indice]) ?: (new NeoxEncryptor())->setData($indice);
-
-            //            $indice = OpenSSLTools::builderIndice($entity);
-//            if (!$encryptor = $this->entityManager->getRepository(NeoxEncryptor::class)->findOneBy(['data' => $indice])) {
-//                $encryptor = new NeoxEncryptor();
-//                $encryptor->setData($indice);
-//            };
-//
-//            return $encryptor;
         }
     }

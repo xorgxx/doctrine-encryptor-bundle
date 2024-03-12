@@ -35,9 +35,8 @@ doctrine_encryptor.yaml file
     # this is only for testing purpose in Development mode !!!
     nencryptor_off: false
     encryptor_cipherAlgorithm: AES-256-CBC  # AES-256-CBC | !!! Camellia-256-CBC !!!
-    encryptor_system: halite # halite | openSSLSym | !!! openSSLAsym !!! (das not support advance typing (obejt, array, ...) yet) 
+    encryptor_system: halite # halite | openSSLSym | !!! DEPRECIATED openSSLAsym !!! (das not support advance typing (obejt, array, ...) yet) 
   
-
 ````   
     /** 
     * ===== openSSLSym is match faster !! | ======
