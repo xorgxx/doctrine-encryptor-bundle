@@ -238,7 +238,8 @@
                     $process      = $value ? $this->isSerialized( $this->encryptor->decrypt( $value ) ) : null;
                 }
             }
-            return $process;
+            $p = "get{$action}";
+            return $process ?? $entity->$p();
         }
 
         /**
