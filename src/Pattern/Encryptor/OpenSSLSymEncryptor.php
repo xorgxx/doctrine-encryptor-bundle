@@ -46,12 +46,15 @@
         private string $cipherAlgorithm = 'Camellia-256-CBC';
 
         public function __construct(readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools)
-        {}
-        
+        {
+            $this->cipherAlgorithm = $parameterBag->get('doctrine_encryptor.encryptor_cipher_algorithm');
+        }
+
         /**
          * @param string $plainText
          *
          * @return string
+         * @throws \Exception
          */
         public function encrypt($plainText): string
         {
@@ -60,7 +63,7 @@
             $plainText  = base64_Encode($cipherText);
 
             if (!$cipherText) {
-                throw new \Exception("Unable to encrypt message. {$plainText} - is this string !?? (knowladge issue).  Your data havent been encrypted.");
+                throw new \Exception("Unable to encrypt message. {$plainText} - is this string !?? (knowledge issue).  Your data havent been encrypted.");
             }
             return $plainText;
         }

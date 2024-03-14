@@ -8,11 +8,11 @@
 
     class OpenSSLTools
     {
-        const PRIVATE_KEY = 'openSSL_private.pem';
-        const PUBLIC_KEY  = 'openSSL_public.pem';
-        const ENCRYPT_BIN = 'openSSL.bin';
-        const PATH_FOLDER = '/config/doctrine-encryptor/';
-        const PREFIX      = 'NEOX';
+        public const PRIVATE_KEY = 'openSSL_private.pem';
+        public const PUBLIC_KEY  = 'openSSL_public.pem';
+        public const ENCRYPT_BIN = 'openSSL.bin';
+        public const PATH_FOLDER = '/config/doctrine-encryptor/';
+        const PREFIX             = 'NEOX';
 
         public function __construct( readonly ParameterBagInterface $parameterBag )
         {
@@ -20,7 +20,7 @@
 
         public static function buildAsymetricKey( string $algoOpen, string $KeyLengths ): void
         {
-            $directory      = dirname( __DIR__, 6 ) . SELF::PATH_FOLDER;
+            $directory      = dirname( __DIR__, 6 ) . self::PATH_FOLDER;
             $privateKeyFile = $directory . self::PRIVATE_KEY;
             $publicKeyFile  = $directory . self::PUBLIC_KEY;
             $encryptBin     = $directory . self::ENCRYPT_BIN;
@@ -163,13 +163,13 @@
 
         private static function setKeyRandom32(): string
         {
-            $keyBytes = openssl_random_pseudo_bytes( 32 );
+            $keyBytes = openssl_random_pseudo_bytes( 32, $cstrong );
             return bin2hex( $keyBytes );
         }
 
         public static function getSecretBin(): string
         {
-            $directory       = dirname( __DIR__, 6 ) . SELF::PATH_FOLDER;
+            $directory       = dirname( __DIR__, 6 ) . self::PATH_FOLDER;
             $privateKeyFile  = $directory . self::PRIVATE_KEY;
             $publicKeyFile   = $directory . self::PUBLIC_KEY;
             $encryptBin      = $directory . self::ENCRYPT_BIN;

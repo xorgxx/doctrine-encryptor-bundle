@@ -2,7 +2,7 @@
 
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\tests\Pattern;
 
-    use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\neoxEncryptor;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\NeoxEncryptor;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\DoctrineEncryptorService;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\Encryptor\OpenSSLSymEncryptor;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\NeoxDoctrineFactory;

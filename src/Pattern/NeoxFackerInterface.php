@@ -2,7 +2,7 @@
     
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Pattern;
     
-    interface neoxFackerInterface
+    interface NeoxFackerInterface
     {
         public  function create() : mixed;
     }

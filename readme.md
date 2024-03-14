@@ -9,6 +9,7 @@ The aim of this bundle is to establish, in an automatic and transparent manner, 
 system by externalizing data, in strict compliance with European recommendations and the directives of the General Data
 Protection Regulation (GDPR).
 
+PSR-12
 
 
 [![Doctrineencryptor-schema.png](https://i.postimg.cc/NG408N8j/Doctrineencryptor-schema.png)](https://postimg.cc/0rzxP0HT)
@@ -34,7 +35,7 @@ doctrine_encryptor.yaml file
     # (default)false or true | it will turn off the bundle. by aware that it will render nothing !! field on front will by empty!!
     # this is only for testing purpose in Development mode !!!
     nencryptor_off: false
-    encryptor_cipherAlgorithm: AES-256-CBC  # AES-256-CBC | !!! Camellia-256-CBC !!!
+    encryptor_cipher_algorithm: AES-256-CBC  # AES-256-CBC | !!! Camellia-256-CBC !!!
     encryptor_system: halite # halite | openSSLSym | !!! DEPRECIATED openSSLAsym !!! (das not support advance typing (obejt, array, ...) yet) 
   
 ````   
@@ -45,8 +46,8 @@ doctrine_encryptor.yaml file
     * the openSSLAsym encryptor for handling advanced data typing (obejt, array, ...).!!
     **/
 
-* [Cipher Algorithm list](Doc/cipherAlgorithm.md)
-* [Encryptor list](Doc/encryptor)
+* [Cipher Algorithm list](doc/cipherAlgorithm.md)
+* [Encryptor list](doc/encryptor)
 
 ## Doctrine migrations
 🚨 You will have to make migration to add NeoxEncryptor in your entities. 🚨
@@ -57,11 +58,11 @@ doctrine_encryptor.yaml file
 
 ## Creation .pem & .key
 
-* You may have to create manually folder : config/doctrine-encryptor
+* You may have to create manual folder: config/doctrine-encryptor
 * php bin/console neox:encryptor:openssl follow instruction. 
 
 
-**NOTE:** _You may need to use [ symfony composer dump-autoload ] to reload autoloading_
+**NOTE:** _You may need to use [ symfony composer dump-autoload ] to reload autoload_
 
  ..... Done 🎈
 
@@ -135,7 +136,7 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
   
 ````
 ## Beware !!
-  * **NO possibility to make index or search on field's encrypted**
+  * **NO possibility to make index or search on field encrypted**
 ## 🚨 🚨 Danger 🚨🚨
 **!!! Before you change anything key, attribute "in"/"out" ... !!!**
 1. Decrypt all before
@@ -178,7 +179,7 @@ Occasionally, we may require access to a full range of data (4000 lines or more)
 ````
 
 
-[🚨🚨 **FEATURE ADVANCE** in the box in a future version](Doc/External.md)
+[🚨🚨 **FEATURE ADVANCE** in the box in a future version](doc/External.md)
 
 ## Contributing
 If you want to contribute \(thank you!\) to this bundle, here are some guidelines:

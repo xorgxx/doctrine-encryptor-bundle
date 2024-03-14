@@ -3,7 +3,7 @@
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Command\Helper;
 
     use Doctrine\Persistence\ManagerRegistry;
-    use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\neoxEncryptor;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\NeoxEncryptor;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\DoctrineEncryptorService;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLAlgo;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLTools;
@@ -13,7 +13,7 @@
     use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
     use Symfony\Component\Yaml\Yaml;
 
-    class helperCommand
+    class HelperCommand
     {
 
         public array $entityStatus = [];
@@ -44,7 +44,7 @@
 
                     // Filter attributes to get only those that match neoxEncryptor::class
                     $neoxEncryptorAttributes = array_filter(
-                        $reflectionProperty->getAttributes(), fn( $attribute ) => $attribute->getName() === neoxEncryptor::class
+                        $reflectionProperty->getAttributes(), fn( $attribute ) => $attribute->getName() === NeoxEncryptor::class
                     );
 
                     if( !empty( $neoxEncryptorAttributes ) ) {

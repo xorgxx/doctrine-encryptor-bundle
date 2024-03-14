@@ -4,7 +4,7 @@ namespace DoctrineEncryptor\DoctrineEncryptorBundle\tests\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\neoxEncryptor;
+use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\NeoxEncryptor;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class Parameters
@@ -18,11 +18,11 @@ class Parameters
     private ?string $ind = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[neoxEncryptor(build: "out")]
+    #[NeoxEncryptor(build: "out")]
     private ?string $content = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[neoxEncryptor(build: "in")]
+    #[NeoxEncryptor(build: "in")]
     private ?string $description = null;
 
     public function getId(): ?int

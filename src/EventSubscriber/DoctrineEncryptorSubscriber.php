@@ -25,7 +25,7 @@
     {
         private ?array $event = [
             "action"    => null,
-            "class"
+            "class"     => null
         ];
 
 

@@ -2,8 +2,8 @@
 
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Command;
 
-    use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\neoxEncryptor;
-    use DoctrineEncryptor\DoctrineEncryptorBundle\Command\Helper\helperCommand;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\NeoxEncryptor;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Command\Helper\HelperCommand;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\Halite\HaliteTools;
     use ReflectionException;
     use Symfony\Component\Console\Attribute\AsCommand;
@@ -22,9 +22,9 @@
         private const ALL    = "ALL";
 
         // XDEBUG_TRIGGER=1 php bin/console neox:encryptor:openssl
-        public helperCommand $helperCommand;
+        public HelperCommand $helperCommand;
 
-        public function __construct( helperCommand $helperCommand )
+        public function __construct( HelperCommand $helperCommand )
         {
             $this->helperCommand = $helperCommand;
             parent::__construct();

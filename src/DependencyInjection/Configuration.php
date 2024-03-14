@@ -29,7 +29,7 @@ final class Configuration implements ConfigurationInterface
             ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('encryptor_off')->defaultFalse()->end()
-                ->scalarNode('encryptor_cipherAlgorithm')->defaultValue("Camellia-256-CBC")->end()
+                ->scalarNode('encryptor_cipher_algorithm')->defaultValue("Camellia-256-CBC")->end()
                 ->scalarNode('encryptor_system')->defaultValue("halite")->end()
             ->end()
         ;
