@@ -70,7 +70,7 @@ doctrine_encryptor.yaml file
 In entity, you want to secure field (data) 
 ````php
 
-  use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\neoxEncryptor;
+  use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\NeoxEncryptor;
   ....
   
     #[ORM\Column(type: Types::TEXT, nullable: true)]
