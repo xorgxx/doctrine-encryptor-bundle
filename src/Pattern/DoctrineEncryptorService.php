@@ -218,15 +218,18 @@
             }
         }
 
+        /**
+         * @throws ReflectionException
+         * @throws JsonException
+         */
         public function getTwigDecrypt($entity, string $action): string
         {
-            null;
             $p          = "get{$action}";
             $process    = $entity->$p();
             // Delete the namespace 'Proxies\__CG__\'
             $className  = str_replace('Proxies\__CG__\\', '', $entity::class);
 
-            if (DoctrineEncryptorService::isSupport($className)) {
+            if (self::isSupport($className)) {
                 $this->neoxDoctrineTools->EventListenerAll();
                 $neoxEncryptor = $this->encryptor->getEncryptorId($entity);
                 $this->neoxDoctrineTools->EventListenerAll(true);

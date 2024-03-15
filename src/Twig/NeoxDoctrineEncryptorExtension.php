@@ -4,6 +4,8 @@
 
 
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\DoctrineEncryptorService;
+    use JsonException;
+    use ReflectionException;
     use Twig\Extension\AbstractExtension;
     use Twig\TwigFunction;
     use Twig\TwigFilter;
@@ -35,7 +37,7 @@
         }
 
         /**
-         * @throws ReflectionException
+         * @throws ReflectionException|JsonException
          */
         public function doctrineDecrypt(mixed $entity, string $field): string
         {
@@ -45,7 +47,8 @@
                 // Perform decryption
                 return $this->doctrineEncryptorService->getTwigDecrypt( $entity, $field, false );
             }
-            return true;
+            $p   = "get{$field}";
+            return $entity->$p();
         }
         
         /**
