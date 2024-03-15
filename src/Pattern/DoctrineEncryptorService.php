@@ -220,8 +220,11 @@
 
         public function getTwigDecrypt($entity, string $action): string
         {
+            null;
+            $p          = "get{$action}";
+            $process    = $entity->$p();
             // Delete the namespace 'Proxies\__CG__\'
-            $className = str_replace('Proxies\__CG__\\', '', $entity::class);
+            $className  = str_replace('Proxies\__CG__\\', '', $entity::class);
 
             if (DoctrineEncryptorService::isSupport($className)) {
                 $this->neoxDoctrineTools->EventListenerAll();
@@ -241,8 +244,8 @@
                     $process      = $value ? $this->isSerialized($this->encryptor->decrypt($value)) : null;
                 }
             }
-            $p = "get{$action}";
-            return $process ?? $entity->$p();
+
+            return $process;
         }
 
         /**
