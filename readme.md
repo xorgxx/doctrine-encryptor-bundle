@@ -34,7 +34,7 @@ doctrine_encryptor.yaml file
   doctrine_encryptor:
     # (default)false or true | it will turn off the bundle. by aware that it will render nothing !! field on front will by empty!!
     # this is only for testing purpose in Development mode !!!
-    # 🚨 Future version will include storiged key on external SERVER using JWT for even more security encryptor !!!
+    # 🚨 Future version will include storiged key (openSSL) on external SERVER using JWT for even more security encryptor !!!
     # 🚨 dsn -> encryptor_storaged: %env(OPENSSL_DSN)% 
     nencryptor_off: false
     encryptor_cipher_algorithm: AES-256-CBC  # AES-256-CBC | !!! Camellia-256-CBC !!!
