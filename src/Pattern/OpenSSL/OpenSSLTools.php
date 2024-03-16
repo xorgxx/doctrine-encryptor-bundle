@@ -14,6 +14,7 @@
         public const ENCRYPT_BIN    = 'openSSL.bin';
         public const PATH_FOLDER    = '/config/doctrine-encryptor/';
         const PREFIX                = 'NEOX';
+        private string $SecretBin;
 
         public function __construct( readonly ParameterBagInterface $parameterBag )
         {
@@ -116,11 +117,11 @@
             return false;
         }
 
-        public static function builderIndice( $entity ): string
+        public static function builderIndice( $entity, $sercretBin = null): string
         {
             // Delete the namespace 'Proxies\__CG__\'
             $className      = str_replace( 'Proxies\__CG__\\', '', $entity::class );
-            $sercetBin      = self::getSecretBin();
+            $sercetBin      = $sercretBin; // self::getSecretBin() ;
             $message        = $className . substr( $sercetBin, 4, 6 ) . $entity->getId();
             return hash_hmac( 'gost-crypto', $message, $sercetBin );
         }
@@ -177,6 +178,8 @@
 
         public static function getSecretBin(): string
         {
+            // TODO : not call all time but only if needed !!!
+            // when we will intriduce external storiged it will not be optimze !!
             $directory       = dirname( __DIR__, 6 ) . self::PATH_FOLDER;
             $privateKeyFile  = $directory . self::PRIVATE_KEY;
             $publicKeyFile   = $directory . self::PUBLIC_KEY;
@@ -186,6 +189,7 @@
             $privateKeyPEM   = file_get_contents( $privateKeyFile );
             $publicKeyPEM    = file_get_contents( $publicKeyFile );
 
+            // this line is add to avoid error with old version
             $passKey = file_exists($passKeyFile) ? file_get_contents($passKeyFile) : null;
             openssl_pkey_export( $privateKeyPEM, $private_key, $passKey = null );
 

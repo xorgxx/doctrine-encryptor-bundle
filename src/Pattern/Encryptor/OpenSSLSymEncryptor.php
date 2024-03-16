@@ -44,10 +44,15 @@
          * SEED-CBC : IV de 16 octets
          */
         private string $cipherAlgorithm = 'Camellia-256-CBC';
+        private string $secretKey;
+        private string $iv;
+        
 
         public function __construct(readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools)
         {
             $this->cipherAlgorithm = $parameterBag->get('doctrine_encryptor.encryptor_cipher_algorithm');
+            $this->secretKey       = openSSLTools::getSecretBin();
+            $this->iv              = openSSlTools::getIv($this->cipherAlgorithm);
         }
 
         /**
@@ -58,7 +63,7 @@
          */
         public function encrypt($plainText): string
         {
-            $cipherText = openssl_encrypt($plainText, $this->cipherAlgorithm, openSSLTools::getSecretBin(), OPENSSL_RAW_DATA, openSSlTools::getIv($this->cipherAlgorithm));
+            $cipherText = openssl_encrypt($plainText, $this->cipherAlgorithm, $this->secretKey, OPENSSL_RAW_DATA, $this->iv);
             $this->neoxDoctrineTools->setCountEncrypt(($cipherText ? 1 : 0  ));
             $plainText  = base64_Encode($cipherText);
 
@@ -76,7 +81,7 @@
         public function decrypt($plainText): string
         {
             $cipherText = base64_decode($plainText);
-            $plainText  = openssl_decrypt($cipherText, $this->cipherAlgorithm, openSSLTools::getSecretBin(), OPENSSL_RAW_DATA, openSSlTools::getIv($this->cipherAlgorithm));
+            $plainText  = openssl_decrypt($cipherText, $this->cipherAlgorithm, $this->secretKey, OPENSSL_RAW_DATA, $this->iv);
             $this->neoxDoctrineTools->setCountDecrypt(($cipherText? 1 : 0  ));
             return $plainText;
         }
@@ -99,7 +104,7 @@
         public function getEncryptorId($entity): ?NeoxEncryptor
         {
             // ff5d400f96d533dfda3018dc7dce45f5
-            $indice     = OpenSSLTools::builderIndice($entity);
+            $indice     = OpenSSLTools::builderIndice($entity, $this->secretKey);
             return $this->entityManager->getRepository(NeoxEncryptor::class)->findOneBy(['data' => $indice]) ?: (new NeoxEncryptor())->setData($indice);
         }
     }
