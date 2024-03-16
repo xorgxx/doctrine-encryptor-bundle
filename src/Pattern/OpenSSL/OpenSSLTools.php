@@ -8,11 +8,12 @@
 
     class OpenSSLTools
     {
-        public const PRIVATE_KEY = 'openSSL_private.pem';
-        public const PUBLIC_KEY  = 'openSSL_public.pem';
-        public const ENCRYPT_BIN = 'openSSL.bin';
-        public const PATH_FOLDER = '/config/doctrine-encryptor/';
-        const PREFIX             = 'NEOX';
+        public const PRIVATE_KEY    = 'openSSL_private.pem';
+        public const PUBLIC_KEY     = 'openSSL_public.pem';
+        public const PASS_KEY       = 'passphrase.key';
+        public const ENCRYPT_BIN    = 'openSSL.bin';
+        public const PATH_FOLDER    = '/config/doctrine-encryptor/';
+        const PREFIX                = 'NEOX';
 
         public function __construct( readonly ParameterBagInterface $parameterBag )
         {
@@ -23,6 +24,7 @@
             $directory      = dirname( __DIR__, 6 ) . self::PATH_FOLDER;
             $privateKeyFile = $directory . self::PRIVATE_KEY;
             $publicKeyFile  = $directory . self::PUBLIC_KEY;
+            $passKeyFile    = $directory . self::PASS_KEY;
             $encryptBin     = $directory . self::ENCRYPT_BIN;
 
             // Verify that the directory is writable
@@ -35,7 +37,9 @@
                 throw new \RuntimeException( "Key files already exist." );
             }
             // generate encryptBin
-            $keyEncryptBin = self::setKeyRandom32();
+            $keyEncryptBin  = self::setKeyRandom32();
+            // generate pass
+            $keypass        = self::setKeyRandom32();
 
             if( $algoOpen === 'OPENSSL_KEYTYPE_EC' ) {
                 $keypair = openssl_pkey_new( array( 'private_key_type' => OpenSSLAlgo::getValue( $algoOpen ),
@@ -49,7 +53,7 @@
                 throw new \RuntimeException( "Failed to generate key pair." );
             }
 
-            openssl_pkey_export( $keypair, $private_key );
+            openssl_pkey_export( $keypair, $private_key, $keypass = null );
             $key_details = openssl_pkey_get_details( $keypair );
             $public_key  = $key_details[ 'key' ];
 
@@ -57,6 +61,10 @@
             openssl_public_encrypt( $keyEncryptBin, $encryptedAESKey, $public_key );
 
             if( file_put_contents( $encryptBin, $encryptedAESKey ) === false ) {
+                throw new \RuntimeException( "Failed to write private key to file." );
+            }
+
+            if( file_put_contents( $passKeyFile, $keypass ) === false ) {
                 throw new \RuntimeException( "Failed to write private key to file." );
             }
 
@@ -172,13 +180,17 @@
             $directory       = dirname( __DIR__, 6 ) . self::PATH_FOLDER;
             $privateKeyFile  = $directory . self::PRIVATE_KEY;
             $publicKeyFile   = $directory . self::PUBLIC_KEY;
+            $passKeyFile     = $directory . self::PASS_KEY;
             $encryptBin      = $directory . self::ENCRYPT_BIN;
             $encryptedAESKey = file_get_contents( $encryptBin );
             $privateKeyPEM   = file_get_contents( $privateKeyFile );
             $publicKeyPEM    = file_get_contents( $publicKeyFile );
 
+            $passKey = file_exists($passKeyFile) ? file_get_contents($passKeyFile) : null;
+            openssl_pkey_export( $privateKeyPEM, $private_key, $passKey = null );
+
             // Decrypt the AES key with the RSA public key
-            openssl_private_decrypt($encryptedAESKey, $aesKey, $privateKeyPEM);
+            openssl_private_decrypt($encryptedAESKey, $aesKey, $private_key);
             
             return $aesKey;
         }
