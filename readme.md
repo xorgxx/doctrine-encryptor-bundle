@@ -34,13 +34,18 @@ doctrine_encryptor.yaml file
   doctrine_encryptor:
     # (default)false or true | it will turn off the bundle. by aware that it will render nothing !! field on front will by empty!!
     # this is only for testing purpose in Development mode !!!
-    # 🚨 Future version will include storiged key (openSSL) on external SERVER using JWT for even more security encryptor !!!
-    # 🚨 dsn -> encryptor_storaged: %env(OPENSSL_DSN)% 
     nencryptor_off: false
     encryptor_cipher_algorithm: AES-256-CBC  # AES-256-CBC | !!! Camellia-256-CBC !!!
     encryptor_system: halite # halite | openSSLSym | !!! DEPRECIATED openSSLAsym !!! (das not support advance typing (obejt, array, ...) yet) 
   
-````   
+````
+## More security getting key form external store
+🚨 Future version will include key (openSSL) on external SERVER using JWT, Gaufrette .... for even more security encryptor !!!
+🚨 we are looking to give this option by integer [KnpGaufrette](https://github.com/KnpLabs/KnpGaufretteBundle) .
+In this setup, all keys are stored externally and are not accessible from within your website. This means that even if
+someone gains access to your code, they won't be able to access the keys, providing an additional layer of security for
+your encryption system.
+
     /** 
     * ===== openSSLSym is match faster !! | ======
     * openSSLAsym because is Asymetric we cant put macth data in encrypte SO it's not working well yet!!
