@@ -188,10 +188,11 @@
             $encryptedAESKey = file_get_contents( $encryptBin );
             $privateKeyPEM   = file_get_contents( $privateKeyFile );
             $publicKeyPEM    = file_get_contents( $publicKeyFile );
+            $private_key     = $privateKeyPEM;
 
             // this line is add to avoid error with old version
             $passKey = file_exists($passKeyFile) ? file_get_contents($passKeyFile) : null;
-            openssl_pkey_export( $privateKeyPEM, $private_key, $passKey = null );
+            openssl_pkey_export($privateKeyPEM, $private_key, $passKey);
 
             // Decrypt the AES key with the RSA public key
             openssl_private_decrypt($encryptedAESKey, $aesKey, $private_key);
