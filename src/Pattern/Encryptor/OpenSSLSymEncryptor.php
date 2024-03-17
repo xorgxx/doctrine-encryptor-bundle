@@ -48,9 +48,18 @@
         private string $iv;
         
 
-        public function __construct(readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools)
+        public function __construct(
+            readonly ParameterBagInterface $parameterBag,
+            readonly EntityManagerInterface $entityManager,
+            readonly NeoxDoctrineTools $neoxDoctrineTools
+        )
         {
             $this->cipherAlgorithm = $parameterBag->get('doctrine_encryptor.encryptor_cipher_algorithm');
+            $this->setSecretKeys();
+        }
+
+        private function setSecretKeys(): void
+        {
             $this->secretKey       = openSSLTools::getSecretBin();
             $this->iv              = openSSlTools::getIv($this->cipherAlgorithm);
         }

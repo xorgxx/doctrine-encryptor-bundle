@@ -13,8 +13,10 @@
         public const PASS_KEY       = 'passphrase.key';
         public const ENCRYPT_BIN    = 'openSSL.bin';
         public const PATH_FOLDER    = '/config/doctrine-encryptor/';
-        const PREFIX                = 'NEOX';
+        const PREFIX                = 'doctrine_encryptor.encryptor_';
         private string $SecretBin;
+        private static string $SECRET;
+
 
         public function __construct( readonly ParameterBagInterface $parameterBag )
         {
@@ -189,20 +191,31 @@
             $privateKeyPEM   = file_get_contents( $privateKeyFile );
             $publicKeyPEM    = file_get_contents( $publicKeyFile );
             $private_key     = $privateKeyPEM;
-
-            // this line is add to avoid error with old version
+      
+            // this line is add to avoid error with old version.
             $passKey = file_exists($passKeyFile) ? file_get_contents($passKeyFile) : null;
             openssl_pkey_export($privateKeyPEM, $private_key, $passKey);
 
             // Decrypt the AES key with the RSA public key
             openssl_private_decrypt($encryptedAESKey, $aesKey, $private_key);
-            
+
             return $aesKey;
+        }
+
+        public static function getPrivateKey(?ParameterBagInterface $parameterBag): string
+        {
+            // TODO : not call all time but only if needed !!!
+            // when we will intriduce external storiged it will not be optimze !!
+            $directory       = dirname( __DIR__, 6 ) . self::PATH_FOLDER;
+            $privateKeyFile  = $directory . self::PRIVATE_KEY;
+            return file_get_contents( $privateKeyFile );
         }
         
         public static function getIv($cipherAlgorithm): string
         {
             $ivLength             = openssl_cipher_iv_length($cipherAlgorithm);
-            return substr(self::getSecretBin(), 0, $ivLength);
+            return substr(self::getSecretBin(null), 0, $ivLength);
         }
+        
+        
     }
