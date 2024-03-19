@@ -62,6 +62,22 @@
                 "If you are not sure if you have all your data encrypted, just run the command : php bin/console neox:encryptor:wasaaaa and do not worry about it.",
                 "If key exist it will be override."
             ]);
+            $question           = new ChoiceQuestion("What you :", [self::CANCEL, "Continu", "Decrypt before"]);
+            $question->setErrorMessage('ENTITY : %s does not exist.');
+            $algoOpen           = $this->getHelper('question')->ask($input, $output, $question);
+
+            switch( $algoOpen ) {
+                case self::CANCEL:
+                    $io->success( 'Nothing has been changed.' );
+                    return Command::SUCCESS;
+                case "Decrypt before":
+                    $this->processEncryptor( $input, $output, "Decrypt" );
+                default:
+                    $io->success( "You have chosen {$algoOpen}." );
+                    break;
+            }
+
+            $io->info( "Starting process building Key's" );
             
             // Ask user which entity should be moved.
             $question           = new ChoiceQuestion("Please choose the l'agorithme to use:", $listeAlgos);
@@ -108,6 +124,16 @@
             return Command::SUCCESS;
         }
 
+        private function processEncryptor(InputInterface $input, OutputInterface $output, string $mode = "Decrypt"): void
+        {
+            $autreCommande          = $this->getApplication()->find('n:e:w');
+            $autreCommandeArguments = [
+                '--processing' => 'ALL',
+                '--action'     => $mode,
+            ];
+            $autreCommandeInput     = new ArrayInput($autreCommandeArguments);
+            $autreCommande->run($autreCommandeInput, $output);
+        }
         private function processHaliteKey(InputInterface $input, OutputInterface $output): void
         {
             $autreCommande          = $this->getApplication()->find('n:e:h');

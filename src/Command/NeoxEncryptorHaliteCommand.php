@@ -8,6 +8,7 @@
     use ReflectionException;
     use Symfony\Component\Console\Attribute\AsCommand;
     use Symfony\Component\Console\Command\Command;
+    use Symfony\Component\Console\Input\ArrayInput;
     use Symfony\Component\Console\Input\InputArgument;
     use Symfony\Component\Console\Input\InputInterface;
     use Symfony\Component\Console\Input\InputOption;
@@ -45,7 +46,9 @@
             $io           = new SymfonyStyle( $input, $output );
             $entity[]     = self::ALL;
             $listeAlgos = [ self::CANCEL,
-                "Create" ];
+                "Create",
+                "Decrypt before"
+            ];
 
             // Ask user which entity should be moved.
             $io->warning( [
@@ -55,6 +58,7 @@
                 "If you are not sure if you have all your data encrypted, just run the command : php bin/console neox:encryptor:wasaaaa and do not worry about it.",
                 "If key exist it will be override."
                 ]);
+            
             $question = new ChoiceQuestion( "", $listeAlgos );
             $question->setErrorMessage( 'ENTITY : %s does not exist.' );
             $algoOpen = $this->getHelper( 'question' )->ask( $input, $output, $question );
@@ -63,12 +67,14 @@
                 case self::CANCEL:
                     $io->success( 'Nothing has been changed.' );
                     return Command::SUCCESS;
-
+                case "Decrypt before":
+                    $this->processEncryptor( $input, $output, "Decrypt" );
                 default:
                     $io->success( "You have chosen {$algoOpen}." );
                     break;
             }
-
+            $io->info( "Starting process building Key's" );
+            
             // process ascymetric encryption
             $r = HaliteTools::buildEncryptionKey($this->helperCommand->haliteEncryptor);
 
@@ -76,4 +82,16 @@
             
             return Command::SUCCESS;
         }
+
+        private function processEncryptor(InputInterface $input, OutputInterface $output, string $mode = "Decrypt"): void
+        {
+            $autreCommande          = $this->getApplication()->find('n:e:w');
+            $autreCommandeArguments = [
+                '--processing' => 'ALL',
+                '--action'     => $mode,
+            ];
+            $autreCommandeInput     = new ArrayInput($autreCommandeArguments);
+            $autreCommande->run($autreCommandeInput, $output);
+        }
+
     }
