@@ -4,10 +4,13 @@
 
     use Doctrine\ORM\EntityManagerInterface;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Entity\NeoxEncryptor;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\CacheManagerService;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\EncryptorInterface;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\NeoxDoctrineTools;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLTools;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\Halite\HaliteTools;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\SecureKey;
+    use Gaufrette\Filesystem;
     use ParagonIE\Halite\Alerts\CannotPerformOperation;
     use ParagonIE\Halite\Alerts\InvalidDigestLength;
     use ParagonIE\Halite\Alerts\InvalidKey;
@@ -18,19 +21,33 @@
     use ParagonIE\Halite\Halite;
     use ParagonIE\Halite\KeyFactory;
     use ParagonIE\Halite\Symmetric\Crypto;
+    use ParagonIE\Halite\Symmetric\EncryptionKey;
     use ParagonIE\Halite\Util;
     use ParagonIE\HiddenString\HiddenString;
     use SodiumException;
     use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-
+    use Knp\Bundle\GaufretteBundle\FilesystemMap;
 
     class HaliteEncryptor implements EncryptorInterface
     {
         private array  $secret;
+        private EncryptionKey $secretKey;
         
-        public function __construct( private readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools )
+        public function __construct( 
+            readonly ParameterBagInterface $parameterBag,
+            readonly EntityManagerInterface $entityManager,
+            readonly NeoxDoctrineTools $neoxDoctrineTools,
+            readonly SecureKey $secureKey,
+        )
         {
-            $this->secret = $this->getEncryptionKey();
+            $this->setSecretKeys();
+        }
+
+        public function setSecretKeys(): void
+        {
+            // return give possibility to reste OpenSSL key !!
+            $this->secretKey       = haliteTools::getSecretBin($this) ?? "null";
+            $this->privateKey      = haliteTools::getHaliteKey($this, haliteTools::PRIVATE_KEY) ?? "null";
         }
 
         /**
@@ -48,11 +65,9 @@
             $Halite = Halite::VERSION_PREFIX;
             // if it is already Encrypted then Decrypted
             if( !preg_match( "/^{$Halite}/", $field ) ) {
-                [ $encryptionKey,
-                    $message ] = HaliteTools::setEncryptionKey( $field );
-                //                [$encryptionKey, $message] = $this->getEncryptionKey($field);
+
                 $this->neoxDoctrineTools->setCountEncrypt(1);
-                return Crypto::encrypt( $message, $encryptionKey, Halite::ENCODE_BASE64 );
+                return Crypto::encrypt( HaliteTools::setEncContent($field), $this->privateKey, Halite::ENCODE_BASE64 );
             }
             return $field;
         }
@@ -73,11 +88,9 @@
 
             // if it is already Encrypted then Decrypted
             if( preg_match( "/^{$Halite}/", $field ) ) {
-                [ $encryptionKey,
-                    $message ] = HaliteTools::setEncryptionKey( $field );
-                //                [$encryptionKey, $message] = $this->getEncryptionKey($field);
+
                 $this->neoxDoctrineTools->setCountDecrypt(1);
-                return Crypto::decrypt( $message->getString(), $encryptionKey, Halite::ENCODE_BASE64 )->getString();
+                return Crypto::decrypt( HaliteTools::setEncContent($field)->getString(), $this->privateKey, Halite::ENCODE_BASE64 )->getString();
             }
             return $field;
         }

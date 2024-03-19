@@ -32,6 +32,7 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('encryptor_cipher_algorithm')->defaultValue("Camellia-256-CBC")->end()
                 ->scalarNode('encryptor_system')->defaultValue("halite")->end()
                 ->scalarNode('encryptor_storage')->defaultValue(null)->end()
+                ->scalarNode('encryptor_cache')->defaultFalse()->end()
             ->end()
         ;
 

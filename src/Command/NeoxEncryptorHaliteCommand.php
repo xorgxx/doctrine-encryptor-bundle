@@ -63,7 +63,7 @@
             }
 
             // process ascymetric encryption
-            $r = HaliteTools::buildEncryptionKey();
+            $r = HaliteTools::buildEncryptionKey($this->helperCommand->haliteEncryptor);
 
             return Command::SUCCESS;
         }

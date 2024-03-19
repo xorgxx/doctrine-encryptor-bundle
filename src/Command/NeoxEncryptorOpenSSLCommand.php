@@ -91,7 +91,7 @@
             }
             
             // process ascymetric encryption
-            $r = OpenSSLTools::buildAsymetricKey($algoOpen, $KeyLengths);
+            $r = OpenSSLTools::buildOpenSSLKey($this->helperCommand->openSSLSymEncryptor, $algoOpen, $KeyLengths);
             
             $this->processHaliteKey($input, $output);
 

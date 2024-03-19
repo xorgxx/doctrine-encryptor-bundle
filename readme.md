@@ -37,14 +37,29 @@ doctrine_encryptor.yaml file
     nencryptor_off: false
     encryptor_cipher_algorithm: AES-256-CBC  # AES-256-CBC | !!! Camellia-256-CBC !!!
     encryptor_system: halite # halite | openSSLSym | !!! DEPRECIATED openSSLAsym !!! (das not support advance typing (obejt, array, ...) yet) 
-  
+    encryptor_storage: 'gaufrette:local' # name of filesystems in you config/gaufrette.yaml
+    encryptor_cache: false # use true for ussing cache system. you will have to setup your application before  
 ````
+To setup your cache system [symfony cache](https://symfony.com/doc/current/components/cache.html)
+
 ## More security getting key form external store
-🚨 Future version will include key (openSSL) on external SERVER using JWT, Gaufrette .... for even more security encryptor !!!
-🚨 we are looking to give this option by integer [KnpGaufrette](https://github.com/KnpLabs/KnpGaufretteBundle) .
+🚨 We use  [KnpGaufrette](https://github.com/KnpLabs/KnpGaufretteBundle) .
 In this setup, all keys are stored externally and are not accessible from within your website. This means that even if
 someone gains access to your code, they won't be able to access the keys, providing an additional layer of security for
 your encryption system.
+In order you have to configure at liste one "adapter":
+config/gaufrette.yaml
+````
+  knp_gaufrette:
+      adapters:
+          local_adapter:
+              local:
+                  directory: '%kernel.project_dir%/config/doctrine-encryptor/'
+  
+      filesystems:
+          local:
+              adapter: local_adapter
+````
 
     /** 
     * ===== openSSLSym is match faster !! | ======

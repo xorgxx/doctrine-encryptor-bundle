@@ -1,39 +1,46 @@
 <?php
-    
+
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Pattern;
-    
+
     use Doctrine\ORM\EntityManagerInterface;
     use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-    
+    use Knp\Bundle\GaufretteBundle\FilesystemMap;
+
     class NeoxDoctrineFactory
     {
-        
-        public function __construct(readonly ParameterBagInterface $parameterBag, readonly EntityManagerInterface $entityManager, readonly NeoxDoctrineTools $neoxDoctrineTools)
-        {
+
+        public function __construct(
+            readonly ParameterBagInterface $parameterBag,
+            readonly EntityManagerInterface $entityManager,
+            readonly NeoxDoctrineTools $neoxDoctrineTools,
+            readonly SecureKey $secureKey,
+        ) {
+
         }
-        
+
         public function buildEncryptor(): mixed
         {
             // Get classe encryptor from .yaml
-            $customEncryptor = $this->getEncryptorClass(); // $this->parameterBag->get('doctrine_encryptor.encryptor_system');>
+            $customEncryptor = $this->getEncryptorClass(
+            ); // $this->parameterBag->get('doctrine_encryptor.encryptor_system');>
             if (!class_exists($customEncryptor)) {
                 throw new \RuntimeException(sprintf("What fuck !! 🫤 Class '%s' not found", $customEncryptor));
             }
-            return (new $customEncryptor($this->parameterBag, $this->entityManager, $this->neoxDoctrineTools));
+            return (new $customEncryptor($this->parameterBag, $this->entityManager, $this->neoxDoctrineTools, $this->secureKey));
         }
-        
+
         private function getEncryptorClass(): string
         {
             // Recover the default encryption service
             $encryptorSystem = $this->parameterBag->get("doctrine_encryptor.encryptor_system");
             // If the encryption system is "OpenSSL" or "Halite", use the getBuildInEncryptor method, otherwise keep the current value.
             // preg_match("/^openSSL/", $encryptorSystem)
-            if ( $encryptorSystem === "openSSLSym" || $encryptorSystem === "halite") {
+            if ($encryptorSystem === "openSSLSym" || $encryptorSystem === "halite") {
                 $encryptorSystem = $this->getBuildInEncryptor($encryptorSystem);
             }
             return $encryptorSystem;
         }
-        
+
         private function getBuildInEncryptor(string $name): string
         {
             return "DoctrineEncryptor\\DoctrineEncryptorBundle\\Pattern\\Encryptor\\" . ucfirst($name) . "Encryptor";

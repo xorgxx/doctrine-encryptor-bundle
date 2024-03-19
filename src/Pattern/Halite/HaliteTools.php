@@ -2,6 +2,7 @@
 
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\Halite;
 
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\EncryptorInterface;
     use ParagonIE\HiddenString\HiddenString;
     use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
     use ParagonIE\Halite\KeyFactory;
@@ -17,75 +18,123 @@
         const PATH_FOLDER = '/config/doctrine-encryptor/';
         const PREFIX      = 'NEOX';
 
-        public function __construct( readonly ParameterBagInterface $parameterBag )
+        public function __construct(readonly ParameterBagInterface $parameterBag)
         {
         }
 
 
-        public static function buildEncryptionKey(): void
+        public static function buildEncryptionKey(EncryptorInterface $t): void
         {
-            $directory      = dirname( __DIR__, 6 ) . self::PATH_FOLDER;
-            $privateKeyFile = $directory . self::PRIVATE_KEY;
-            $publicKeyFile  = $directory . self::PUBLIC_KEY;
-            $encryptKeyFile = $directory . self::ENCRYPT_KEY;
-
-            // Verify that the directory is writable
-            if( !is_writable( $directory ) ) {
-                throw new \RuntimeException( "Directory $directory is not writable." );
-            }
-            // Check if the keystores already exist
-            //            if( file_exists( $privateKeyFile ) || file_exists( $publicKeyFile ) ) {
-            //                throw new \RuntimeException( "Key files already exist." );
-            //            }
+            // RESTE all key ======== !!!
+            $t->secureKey->resteAllKey("halite");
+            // RESTE all key ======== !!!
 
             $encKey = KeyFactory::generateEncryptionKey();
-            KeyFactory::save( $encKey, $encryptKeyFile );
+            $encKey = KeyFactory::export($encKey)->getString();
+            self::setNameKey($t, self::ENCRYPT_KEY, $encKey);
 
             $keypair = KeyFactory::generateEncryptionKeyPair();
-            KeyFactory::save( $keypair->getSecretKey(), $privateKeyFile );
-            KeyFactory::save( $keypair->getPublicKey(), $publicKeyFile );
 
+            $encKey  = KeyFactory::export($keypair->getSecretKey())->getString();
+            self::setNameKey($t, self::PRIVATE_KEY, $encKey);
+
+            $encKey = KeyFactory::export($keypair->getPublicKey())->getString();
+            self::setNameKey($t, self::PUBLIC_KEY, $encKey);
         }
 
         public static function getEncryptionKey(): EncryptionKey
         {
-            $directory = dirname( __DIR__, 6 ) . self::PATH_FOLDER . self::ENCRYPT_KEY;
-            $u         = KeyFactory::loadEncryptionKey( $directory );
-            return $u;
+            //            $directory = dirname(__DIR__, 6) . self::PATH_FOLDER . self::ENCRYPT_KEY;
+            //            $u         = KeyFactory::loadEncryptionKey($directory);
+            //            return $u;
         }
 
-        public static function getPrivateKey(): EncryptionKeyPair
+        public static function getSecretBin($t): ?EncryptionKey
         {
-            $directory = dirname( __DIR__, 6 ) . self::PATH_FOLDER . self::PRIVATE_KEY;
-            return KeyFactory::loadEncryptionKeyPair( $directory );
+            // TODO : not call all time but only if needed !!!
+            // when we will intriduce external storiged it will not be optimze !!
+            // charge ussing cache Wooooo
+            if ($t->parameterBag->get('doctrine_encryptor.encryptor_cache')) {
+                // read cache [redis]
+                $encryptedAESKey = self::getNameKey($t, self::ENCRYPT_KEY);
+                $privateKeyPEM   = self::getNameKey($t, self::PRIVATE_KEY);
+                $publicKeyPEM    = self::getNameKey($t, self::PUBLIC_KEY);
+            } else {
+                // read "abord" [gaufrette]
+                $encryptedAESKey = self::getNameKeyGaufrette($t, self::ENCRYPT_KEY);
+                $privateKeyPEM   = self::getNameKeyGaufrette($t, self::PRIVATE_KEY);
+                $publicKeyPEM    = self::getNameKeyGaufrette($t, self::PUBLIC_KEY);
+            };
+
+
+            // return null if not found
+            if (!$encryptedAESKey || !$privateKeyPEM) {
+                return null;
+            }
+
+            // Decrypt the AES key with the RSA public key
+            $encryptionKey = KeyFactory::deriveEncryptionKey(
+                $encryptedAESKey,
+                substr($encryptedAESKey->getstring(), 11, 16)
+            );
+            return $encryptionKey;
         }
 
-        public static function getPublicKey(): EncryptionKeyPair
+        public static function setEncContent(string $msg = ""): ?HiddenString
         {
-            $directory = dirname( __DIR__, 6 ) . self::PATH_FOLDER . self::PUBLIC_KEY;
-            return KeyFactory::loadEncryptionKeyPair( $directory );
+            return new HiddenString($msg);
         }
 
-        public static function setEncryptionKey( string $msg = "" ): array
+        public static function getHaliteKey($t, string $key = self::PRIVATE_KEY): ?EncryptionKey
         {
-            $enc_key       = self::getEncryptionKey();
-            $key_hex       = KeyFactory::export( $enc_key )->getString();
-            $key           = new HiddenString( $key_hex );
-            $encryptionKey = KeyFactory::deriveEncryptionKey( $key, substr( $key->getString(), 11, 16 ) );
-            $message       = new HiddenString( $msg );
-            return [ $encryptionKey,
-                $message ];
+            return self::getNameKey($t, $key) ? KeyFactory::importEncryptionKey(
+                self::getNameKey($t, $key)
+            ) : null;
         }
 
-        public static function setBuildIndice( $entity ): string
+        //        public static function getPublicKey(): EncryptionKeyPair
+        //        {
+        //            $directory = dirname(__DIR__, 6) . self::PATH_FOLDER . self::PUBLIC_KEY;
+        //            return KeyFactory::loadEncryptionKeyPair($directory);
+        //        }
+
+        public static function setEncryptionKey(string $msg = ""): array
+        {
+            //            $enc_key       = self::getEncryptionKey();
+            //            $key_hex       = KeyFactory::export($enc_key)->getString();
+            //            $key           = new HiddenString($key_hex);
+            //            $encryptionKey = KeyFactory::deriveEncryptionKey($key, substr($key->getString(), 11, 16));
+            //            $message       = new HiddenString($msg);
+            //            return [
+            //                $encryptionKey,
+            //                $message
+            //            ];
+        }
+
+        public static function setBuildIndice($entity): string
         {
             // Delete the namespace 'Proxies\__CG__\'
-            $className     = str_replace( 'Proxies\__CG__\\', '', $entity::class );
-            $enc_key       = self::getEncryptionKey();
-            $key_hex       = KeyFactory::export( $enc_key )->getString();
-            $key           = new HiddenString( $key_hex );
-            $imput         = $className . substr( $key->getString(), 15, 4 ) . $entity->getId();
-            $encryptionKey = KeyFactory::deriveEncryptionKey( $key, substr( $key->getString(), 11, 16 ) );
-            return Util::keyed_hash( $imput, $encryptionKey, 16 );
+            $className = str_replace('Proxies\__CG__\\', '', $entity::class);
+            $enc_key = self::getEncryptionKey();
+            $key_hex = KeyFactory::export($enc_key)->getString();
+            $key = new HiddenString($key_hex);
+            $imput = $className . substr($key->getString(), 15, 4) . $entity->getId();
+            $encryptionKey = KeyFactory::deriveEncryptionKey($key, substr($key->getString(), 11, 16));
+            return Util::keyed_hash($imput, $encryptionKey, 16);
+        }
+
+        private static function setNameKey(EncryptorInterface $t, string $key, string $content): ?string
+        {
+            return $t->secureKey->setKeyName($key, $content);
+        }
+
+        private static function getNameKey(EncryptorInterface $t, string $key): ?HiddenString
+        {
+            return new HiddenString($t->secureKey->getKeyName($key));
+        }
+
+        private static function getNameKeyGaufrette(EncryptorInterface $t, string $key): ?HiddenString
+        {
+            return new HiddenString($t->secureKey->getKeyNameGaufrette($key));
         }
     }

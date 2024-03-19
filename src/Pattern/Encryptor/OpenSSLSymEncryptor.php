@@ -7,9 +7,13 @@
     
     use Doctrine\ORM\EntityManagerInterface;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Entity\NeoxEncryptor;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\CacheManagerService;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\EncryptorInterface;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\NeoxDoctrineTools;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLTools;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\SecureKey;
+    use Gaufrette\Filesystem;
+    use Knp\Bundle\GaufretteBundle\FilesystemMap;
     use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
     
     class OpenSSLSymEncryptor implements EncryptorInterface
@@ -43,7 +47,7 @@
          * SEED :
          * SEED-CBC : IV de 16 octets
          */
-        private string $cipherAlgorithm = 'Camellia-256-CBC';
+        public string $cipherAlgorithm = 'Camellia-256-CBC';
         private string $secretKey;
         private string $iv;
         
@@ -51,17 +55,19 @@
         public function __construct(
             readonly ParameterBagInterface $parameterBag,
             readonly EntityManagerInterface $entityManager,
-            readonly NeoxDoctrineTools $neoxDoctrineTools
+            readonly NeoxDoctrineTools $neoxDoctrineTools,
+            readonly SecureKey $secureKey, /** very important !! **/
         )
         {
             $this->cipherAlgorithm = $parameterBag->get('doctrine_encryptor.encryptor_cipher_algorithm');
             $this->setSecretKeys();
         }
 
-        private function setSecretKeys(): void
+        public function setSecretKeys(): void
         {
-            $this->secretKey       = openSSLTools::getSecretBin();
-            $this->iv              = openSSlTools::getIv($this->cipherAlgorithm);
+            // return give possibility to reste OpenSSL key !!
+            $this->secretKey       = openSSLTools::getSecretBin($this) ?? "null";
+            $this->iv              = openSSlTools::getIv($this)?? "null";
         }
 
         /**
