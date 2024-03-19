@@ -54,6 +54,14 @@
             $entity[]           = self::ALL;
             $listeAlgos         = array_column(OpenSSLAlgo::getListe(), 'value');
             $listeAlgos[]       = self::CANCEL;
+
+            $io->warning( [
+                "Builder key for OpenSSL",
+                "If the first time you run this command, it will create a key. You dont need to read the next message",
+                "If you have previously encrypted data in your database, do not attempt any further actions until you have decrypted all the data in your database. ** BE CAUTIOUS **",
+                "If you are not sure if you have all your data encrypted, just run the command : php bin/console neox:encryptor:wasaaaa and do not worry about it.",
+                "If key exist it will be override."
+            ]);
             
             // Ask user which entity should be moved.
             $question           = new ChoiceQuestion("Please choose the l'agorithme to use:", $listeAlgos);

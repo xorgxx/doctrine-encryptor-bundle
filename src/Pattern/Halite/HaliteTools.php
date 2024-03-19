@@ -15,7 +15,7 @@
         const ENCRYPT_KEY = 'halite_encrypt.key';
         const PRIVATE_KEY = 'halite_private.pem';
         const PUBLIC_KEY  = 'halite_public.pem';
-        const PATH_FOLDER = '/config/doctrine-encryptor/';
+//        const PATH_FOLDER = '/config/doctrine-encryptor/';
         const PREFIX      = 'NEOX';
 
         public function __construct(readonly ParameterBagInterface $parameterBag)
