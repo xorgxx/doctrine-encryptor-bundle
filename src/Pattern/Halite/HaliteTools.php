@@ -40,6 +40,7 @@
 
             $encKey = KeyFactory::export($keypair->getPublicKey())->getString();
             self::setNameKey($t, self::PUBLIC_KEY, $encKey);
+
         }
 
         public static function getEncryptionKey(): EncryptionKey
@@ -125,6 +126,7 @@
 
         private static function setNameKey(EncryptorInterface $t, string $key, string $content): ?string
         {
+            echo "[OK] Gaufrette create new key : " . $key . "\n";
             return $t->secureKey->setKeyName($key, $content);
         }
 

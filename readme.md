@@ -88,6 +88,8 @@ config/gaufrette.yaml
 
  ..... Done 🎈
 
+**because it's not realise yet, before making update bundle, we recommende to decrypt all your sandbox data**
+
 ## Usage !
 In entity, you want to secure field (data) 
 ````php

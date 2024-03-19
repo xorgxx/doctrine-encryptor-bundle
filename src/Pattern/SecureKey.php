@@ -24,7 +24,7 @@
 
         public function setKeyName(string $name, string $content)
         {
-            $this->filesystem = $this->fileSystemMap->get('neox');
+            $this->getConfigGaufrette();
             return $this->filesystem->getadapter()->write($name, $content);
         }
 
@@ -39,8 +39,8 @@
 
         public function getKeyNameGaufrette(string $name)
         {
-            $this->filesystem = $this->fileSystemMap->get('neox');
-            $k                = $this->filesystem->get($name);
+            $this->getConfigGaufrette();
+            $k = $this->filesystem->get($name);
             return $this->filesystem->getadapter()->read($k);
         }
 
@@ -60,10 +60,7 @@
         private function initialize()
         {
             // get config gaufrette
-            $conf    = $this->parameterBag->get('doctrine_encryptor.encryptor_storage');
-            $adaptor = explode(':', $conf)[ 1 ]; // get go
-
-            $this->filesystem = $this->fileSystemMap->get($adaptor);
+            $this->getConfigGaufrette();
             $this->filesBag   = $this->cacheManager->cache->get("KEYS", function (ItemInterface $item) {
                 $this->filesBag = $this->filesystem->listKeys("");
                 $item->expiresAfter(self::LIFETIME);
@@ -86,4 +83,30 @@
             }
         }
 
+        /**
+         * @return string
+         */
+        private function getConfigGaufrette(): string
+        {
+            $conf = $this->parameterBag->get('doctrine_encryptor.encryptor_storage');
+            if (!$conf) {
+                throw new \Exception(
+                    'Configuration doctrine_encryptor.encryptor_storage not found. Check your config\\doctrine_encryptor.yml'
+                );
+            }
+            $adaptor          = explode(':', $conf)[ 1 ];
+            if (!$adaptor) {
+                throw new \Exception(
+                    "No filesystem is registered for name $adaptor"
+                );
+            }
+            try {
+                $this->filesystem = $this->fileSystemMap->get($adaptor);
+            } catch (\Exception $e) {
+                throw new \Exception(
+                    "No filesystem is registered for name $adaptor. Check your gaufrette.yaml"
+                );
+            }
+            return $adaptor; // get go
+        }
     }

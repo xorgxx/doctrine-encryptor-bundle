@@ -65,6 +65,8 @@
             // process ascymetric encryption
             $r = HaliteTools::buildEncryptionKey($this->helperCommand->haliteEncryptor);
 
+            $io->success( "Successfully build. check in folder that you setup in gaufrette.yaml" );
+            
             return Command::SUCCESS;
         }
     }
