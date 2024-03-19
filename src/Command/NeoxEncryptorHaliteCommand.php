@@ -52,8 +52,8 @@
 
             // Ask user which entity should be moved.
             $io->warning( [
-                "Before you start the process, you must have your data encrypted all your database.",
-                "We recommend you stop all trafic in your database. Put your web site in maintenance mode.",
+                "Prior to initiating the process, ensure that all data in your database is encrypted.",
+                "We highly advise halting all traffic to your database and putting your website in maintenance mode."
             ]);
             $question = new ChoiceQuestion( "", [self::CANCEL, "Continue, i know the risque"] );
             $question->setErrorMessage( 'ENTITY : %s does not exist.' );
