@@ -24,7 +24,9 @@
 
         public function setKeyName(string $name, string $content)
         {
-            $this->getConfigGaufrette();
+            
+            $adaptator = $this->getConfigGaufrette();
+            echo "[OK] Gaufrette - filesystems : $adaptator -> create new key : $name  \n";
             return $this->filesystem->getadapter()->write($name, $content);
         }
 

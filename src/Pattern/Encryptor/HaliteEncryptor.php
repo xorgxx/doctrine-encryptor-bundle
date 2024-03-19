@@ -31,7 +31,7 @@
     class HaliteEncryptor implements EncryptorInterface
     {
         private array  $secret;
-        private EncryptionKey $secretKey;
+        private ?EncryptionKey $secretKey;
         
         public function __construct( 
             readonly ParameterBagInterface $parameterBag,
@@ -46,8 +46,8 @@
         public function setSecretKeys(): void
         {
             // return give possibility to reste OpenSSL key !!
-            $this->secretKey       = haliteTools::getSecretBin($this) ?? "null";
-            $this->privateKey      = haliteTools::getHaliteKey($this, haliteTools::PRIVATE_KEY) ?? "null";
+            $this->secretKey       = haliteTools::getSecretBin($this) ?? null;
+            $this->privateKey      = haliteTools::getHaliteKey($this, haliteTools::PRIVATE_KEY) ?? null;
         }
 
         /**

@@ -126,13 +126,17 @@
 
         private static function setNameKey(EncryptorInterface $t, string $key, string $content): ?string
         {
-            echo "[OK] Gaufrette create new key : " . $key . "\n";
+            
             return $t->secureKey->setKeyName($key, $content);
         }
 
         private static function getNameKey(EncryptorInterface $t, string $key): ?HiddenString
         {
-            return new HiddenString($t->secureKey->getKeyName($key));
+            $o = $t->secureKey->getKeyName($key) ?? null;
+            if ($o) {
+                return new HiddenString($o);
+            }
+            return null;
         }
 
         private static function getNameKeyGaufrette(EncryptorInterface $t, string $key): ?HiddenString
