@@ -56,6 +56,24 @@
             $listeAlgos[]       = self::CANCEL;
 
             $io->warning( [
+                "Before you start this process, you must have your data encrypted all your database.",
+                "We recommend you stop all trafic in your database. Put your web site in maintenance mode.",
+            ]);
+            $question = new ChoiceQuestion( "", [self::CANCEL, "Continue, i know the risque"] );
+            $question->setErrorMessage( 'ENTITY : %s does not exist.' );
+            $algoOpen = $this->getHelper( 'question' )->ask( $input, $output, $question );
+
+            switch( $algoOpen ) {
+                case self::CANCEL:
+                    $io->success( 'Nothing has been changed.' );
+                    return Command::SUCCESS;
+
+                default:
+                    $io->success( "You have chosen to continue." );
+                    break;
+            }
+            
+            $io->warning( [
                 "Builder key for OpenSSL",
                 "If the first time you run this command, it will create a key. You dont need to read the next message",
                 "If you have previously encrypted data in your database, do not attempt any further actions until you have decrypted all the data in your database. ** BE CAUTIOUS **",
@@ -117,7 +135,7 @@
             // process ascymetric encryption
             $r = OpenSSLTools::buildOpenSSLKey($this->helperCommand->openSSLSymEncryptor, $algoOpen, $KeyLengths);
             
-            $this->processHaliteKey($input, $output);
+//            $this->processHaliteKey($input, $output);
 
             $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
             
