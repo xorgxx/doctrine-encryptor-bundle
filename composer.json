@@ -57,10 +57,12 @@
   },
   "scripts": {
     "post-install-cmd": [
-      "DoctrineEncryptor\\DoctrineEncryptorBundle\\Resources\\script\\PostInstallScript::doctrineEncryptor",
-      "DoctrineEncryptor\\DoctrineEncryptorBundle\\Resources\\script\\PostInstallScript::gaufrette"
+      "@auto-scripts"
     ],
     "post-update-cmd": [
+      "@auto-scripts"
+    ],
+    "auto-scripts": [
       "DoctrineEncryptor\\DoctrineEncryptorBundle\\Resources\\script\\PostInstallScript::doctrineEncryptor",
       "DoctrineEncryptor\\DoctrineEncryptorBundle\\Resources\\script\\PostInstallScript::gaufrette"
     ]

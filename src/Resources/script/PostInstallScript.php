@@ -7,7 +7,7 @@
     
     class PostInstallScript
     {
-        public static function doctrineEncryptor()
+        public static function doctrineEncryptor(): void
         {
             // Chemin vers le fichier de configuration YAML de votre bundle pour Doctrine Encryptor
             $source = dirname(__DIR__, 6) . '/config/packages/doctrine_encryptor.yaml';
@@ -24,7 +24,7 @@
 
         }
 
-        public static function gaufrette()
+        public static function gaufrette(): void
         {
             $source = dirname(__DIR__, 6) . '/config/packages/gaufrette.yaml';
             $targetFile = dirname(__DIR__, 1) . '/config/setup/gaufrette.yaml';
