@@ -59,6 +59,10 @@
     "post-install-cmd": [
       "DoctrineEncryptor\\DoctrineEncryptorBundle\\Resources\\script\\PostInstallScript::doctrineEncryptor",
       "DoctrineEncryptor\\DoctrineEncryptorBundle\\Resources\\script\\PostInstallScript::gaufrette"
+    ],
+    "post-update-cmd": [
+      "DoctrineEncryptor\\DoctrineEncryptorBundle\\Resources\\script\\PostInstallScript::doctrineEncryptor",
+      "DoctrineEncryptor\\DoctrineEncryptorBundle\\Resources\\script\\PostInstallScript::gaufrette"
     ]
   }
 }
