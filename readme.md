@@ -167,6 +167,7 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
 2. Change what you want ex: attribute from "in" to "out"
 3. Encrypt ALL
 
+
 ## [CLI] Command build-in
   * php bin/console neox:encryptor:wasaaaa // command line to crypt/decrypt
   * php bin/console neox:encryptor:openssl // command to create .pem & .key
