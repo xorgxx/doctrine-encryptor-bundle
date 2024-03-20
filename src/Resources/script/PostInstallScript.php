@@ -1,6 +1,6 @@
 <?php
 
-    namespace DoctrineEncryptor\DoctrineEncryptorBundle\src\Resources\script;
+    namespace DoctrineEncryptor\DoctrineEncryptorBundle\Resources\script;
 
     use Symfony\Component\Yaml\Yaml;
 
