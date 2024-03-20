@@ -1,0 +1,9 @@
+knp_gaufrette:
+    adapters:
+        neox_adapter:
+            local:
+                directory: '%kernel.project_dir%/config/doctrine-encryptor/'
+
+    filesystems:
+        neox:
+            adapter: neox_adapter

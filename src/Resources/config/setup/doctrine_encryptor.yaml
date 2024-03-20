@@ -1,0 +1,10 @@
+# (default)false or true | it will turn off the bundle. by aware that it will render nothing !! field on front will by empty!!
+# this is only for testing purpose in Development mode !!!
+# nencryptor_off: false
+# encryptor_system: halite # halite | openSSLSym | openSSLAsym (das not support advance typing (obejt, array, ...) yet)
+doctrine_encryptor:
+	encryptor_off: false
+	encryptor_cipher_algorithm: AES-256-CBC
+	encryptor_system: openSSLSym
+	encryptor_storage: 'gaufrette:neox'
+	encryptor_cache: false

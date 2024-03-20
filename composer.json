@@ -54,5 +54,11 @@
     "psr-4": {
       "DoctrineEncryptor\\DoctrineEncryptorBundle\\tests\\": "tests/"
     }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "DoctrineEncryptor\\DoctrineEncryptorBundle\\src\\Resources\\script\\PostInstallScript::doctrineEncryptor",
+      "DoctrineEncryptor\\DoctrineEncryptorBundle\\src\\Resources\\script\\PostInstallScript::gaufrette"
+    ]
   }
 }
