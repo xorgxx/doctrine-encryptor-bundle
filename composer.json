@@ -62,6 +62,7 @@
     "post-update-cmd": [
       "@auto-scripts"
     ],
+
     "auto-scripts": [
       "DoctrineEncryptor\\DoctrineEncryptorBundle\\Resources\\script\\PostInstallScript::doctrineEncryptor",
       "DoctrineEncryptor\\DoctrineEncryptorBundle\\Resources\\script\\PostInstallScript::gaufrette"
