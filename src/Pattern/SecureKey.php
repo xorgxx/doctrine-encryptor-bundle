@@ -42,8 +42,9 @@
         public function getKeyNameGaufrette(string $name)
         {
             $this->getConfigGaufrette();
-            $k = $this->filesystem->get($name);
-            return $this->filesystem->getadapter()->read($k);
+            return $this->filesystem->read($name);
+//            $k = $this->filesystem->get($name);
+//            return $this->filesystem->getadapter()->read($k);
         }
 
         public function resteAllKey(string $filter)
