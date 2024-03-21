@@ -6,10 +6,11 @@
 	use Symfony\Component\Config\FileLocator;
 	use Symfony\Component\DependencyInjection\ContainerBuilder;
 	use Symfony\Component\DependencyInjection\Extension\Extension;
+    use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 	use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
     use Symfony\Component\DependencyInjection\Reference;
 
-    class DoctrineEncryptorExtension extends Extension
+    class DoctrineEncryptorExtension extends Extension implements PrependExtensionInterface
 	{
 
 		/**
@@ -31,4 +32,11 @@
             }
         
 		}
+
+        public function prepend(ContainerBuilder $container)
+        {
+            // Charge la configuration Monolog à partir du fichier monolog.yaml de votre bundle
+            $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/setup/'));
+            $loader->load('neox_encryptor.yaml');
+        }
 	}

@@ -10,6 +10,7 @@
     use ReflectionClass;
     use ReflectionException;
     use ReflectionProperty;
+    use Psr\Log\LoggerInterface;
 
     class DoctrineEncryptorService
     {
@@ -25,7 +26,8 @@
 
         public function __construct(
             readonly NeoxDoctrineFactory $neoxDoctrineFactory,
-            readonly NeoxDoctrineTools $neoxDoctrineTools
+            readonly NeoxDoctrineTools $neoxDoctrineTools,
+            readonly LoggerInterface $logger
         ) {
             $this->getEncryptor();
         }
@@ -123,6 +125,8 @@
                 $Reflection->getProperty()->setValue($entity, $process);
             }
 
+            $this->logger("enc", $entity, $Reflection);
+
             if ($items) {
                 $this->entityCurentState = $entity::class;
                 $neoxEncryptor?->setContent(json_encode($items, JSON_THROW_ON_ERROR | false, 512));
@@ -168,6 +172,8 @@
                 //                $this->fieldCurentState = $process;
                 $Reflection->getProperty()->setValue($entity, $process);
             }
+
+            $this->logger("dec", $entity, $Reflection);
         }
 
         /**
@@ -224,10 +230,10 @@
          */
         public function getTwigDecrypt($entity, string $action): string
         {
-            $p          = "get{$action}";
-            $process    = $entity->$p();
+            $p       = "get{$action}";
+            $process = $entity->$p();
             // Delete the namespace 'Proxies\__CG__\'
-            $className  = str_replace('Proxies\__CG__\\', '', $entity::class);
+            $className = str_replace('Proxies\__CG__\\', '', $entity::class);
 
             if (self::isSupport($className)) {
                 $this->neoxDoctrineTools->EventListenerAll();
@@ -304,6 +310,20 @@
 
 
             return ($unserializedData = @unserialize($data)) !== false ? $unserializedData : $data;
+        }
+
+        /**
+         * @param       $entity
+         * @param mixed $Reflection
+         *
+         * @return void
+         * @throws ReflectionException
+         */
+        private function logger($action, $entity, mixed $Reflection): void
+        {
+            $className   = (new ReflectionClass($this->encryptor))->getShortName();
+            $entityClass = $entity::class;
+            $this->logger->info("$action : $className : $entityClass | " . $Reflection->getAttributeProperty());
         }
 
     }

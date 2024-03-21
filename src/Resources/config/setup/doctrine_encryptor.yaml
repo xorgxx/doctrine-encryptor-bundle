@@ -8,3 +8,12 @@ doctrine_encryptor:
   encryptor_system: openSSLSym
   encryptor_storage: 'gaufrette:neox'
   encryptor_cache: false
+  
+monolog:
+  channels: ['app']
+  handlers:
+    doctrine_events:
+      type: stream
+      path: '%kernel.logs_dir%/neox_encryptor.log'
+      level: info
+      channels: ['app']

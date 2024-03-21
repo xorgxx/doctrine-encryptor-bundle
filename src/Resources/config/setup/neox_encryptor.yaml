@@ -1,0 +1,14 @@
+monolog:
+    channels: ['app']
+    handlers:
+        neox_encryptor:
+            type: fingers_crossed
+            action_level: info
+            handler: nested
+            channels: ['app']
+        nested:
+            type: rotating_file
+            max_files: 5
+            path: '%kernel.logs_dir%/neox_encryptor.log'
+            level: info
+            channels: ['app']
