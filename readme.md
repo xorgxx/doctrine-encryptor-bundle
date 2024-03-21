@@ -219,6 +219,7 @@ If you want to contribute \(thank you!\) to this bundle, here are some guideline
     * You add a new feature
     * You see code that works but isn't covered by any tests \(there is a special place in heaven for you\)
 ## Todo
+* History of command line to have proctection when encrypt/decrypt !!
 * Testing App !! Need help for this.
 * IT DAS NOT CONVERT ADVANCE TYPE (objet, array, date ....)
 * ~~Add a Remote system for storage Hash => Key~~
