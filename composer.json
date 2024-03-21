@@ -65,6 +65,15 @@
     "auto-scripts": [
       "DoctrineEncryptor\\DoctrineEncryptorBundle\\Resources\\script\\PostInstallScript::doctrineEncryptor",
       "DoctrineEncryptor\\DoctrineEncryptorBundle\\Resources\\script\\PostInstallScript::gaufrette"
+    ],
+    "post-package-install": [
+      "@auto-scripts"
+    ],
+    "post-package-update": [
+      "@auto-scripts"
+    ],
+    "pre-package-uninstall": [
+      "@auto-scripts"
     ]
   }
 }
