@@ -38,8 +38,8 @@ Install the bundle for Composer !! as is still on a beta version !!
 ## Install, setup, folder, .pem .key
 
 * You may have to create manual folder: config/doctrine-encryptor
-* php bin/console neox:encryptor:install follow instruction (this command will setup config files : doctrine-encryptor & gaufrette for you). 
-* php bin/console neox:encryptor:openssl follow instruction.
+* `php bin/console neox:encryptor:install` follow instruction (this command will setup config files : doctrine-encryptor & gaufrette for you). 
+* `php bin/console neox:encryptor:openssl` follow instruction.
 
 **NOTE:** _You may need to use [ symfony composer dump-autoload ] to reload autoload_
 
@@ -172,10 +172,10 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
 
 
 ## [CLI] Command build-in
-  * php bin/console neox:encryptor:wasaaaa // command line to crypt/decrypt
-  * php bin/console neox:encryptor:openssl // command to create .pem & .key
-  * php bin/console neox:encryptor:halite  // command to create .pem & .key
-  * php bin/console neox:encryptor:switch  // command to switch to new encryptor: ex: halite to openSSLSym
+  * `php bin/console neox:encryptor:wasaaaa` // command line to crypt/decrypt
+  * `php bin/console neox:encryptor:openssl` // command to create .pem & .key
+  * `php bin/console neox:encryptor:halite`  // command to create .pem & .key
+  * `php bin/console neox:encryptor:switch`  // command to switch to new encryptor: ex: halite to openSSLSym
   * ~~php bin/console neox:encryptor:renew   // command to change all .pem & .key files. mainly to change cryptage.~~
 
 ####  For exemple | php bin/console neox:encryptor:switch | Process automatique will do this : ex: halite to openSSLSym
