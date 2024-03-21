@@ -28,6 +28,23 @@ Install the bundle for Composer !! as is still on a beta version !!
   composer require paragonie/halite
 ````
 
+
+## Doctrine migrations
+🚨 You will have to make migration to add NeoxEncryptor in your entities. 🚨
+````
+  symfony make:migration
+  symfony doctrine:migrations:migrate
+````
+## Install, setup, folder, .pem .key
+
+* You may have to create manual folder: config/doctrine-encryptor
+* php bin/console neox:encryptor:install follow instruction (this command will setup config files : doctrine-encryptor & gaufrette for you). 
+* php bin/console neox:encryptor:openssl follow instruction.
+
+**NOTE:** _You may need to use [ symfony composer dump-autoload ] to reload autoload_
+
+## ..... Done 🎈
+
 ## Config file
 doctrine_encryptor.yaml file
 ````
@@ -71,22 +88,8 @@ config/gaufrette.yaml
 * [Cipher Algorithm list](doc/cipherAlgorithm.md)
 * [Encryptor list](doc/encryptor)
 
-## Doctrine migrations
-🚨 You will have to make migration to add NeoxEncryptor in your entities. 🚨
-````
-  symfony make:migration
-  symfony doctrine:migrations:migrate
-````
-
-## Creation .pem & .key
-
-* You may have to create manual folder: config/doctrine-encryptor
-* php bin/console neox:encryptor:openssl follow instruction. 
 
 
-**NOTE:** _You may need to use [ symfony composer dump-autoload ] to reload autoload_
-
- ..... Done 🎈
 
 **because it's not realise yet, before making update bundle, we recommende to decrypt all your sandbox data**
 

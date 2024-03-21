@@ -220,7 +220,7 @@
 
         private static function getNameKey(EncryptorInterface $t, string $key): ?string
         {
-            return $t->secureKey->getKeyName($key);
+            return $t->secureKey->getKeyNameCache($key);
         }
 
         private static function getNameKeyGaufrette(EncryptorInterface $t, string $key): ?string

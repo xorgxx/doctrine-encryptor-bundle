@@ -30,7 +30,7 @@
             return $this->filesystem->getadapter()->write($name, $content);
         }
 
-        public function getKeyName(string $name)
+        public function getKeyNameCache(string $name)
         {
             $cache = $this->cacheManager->cache->getitem($name);
             if ($cache->isHit()) {
@@ -42,7 +42,16 @@
         public function getKeyNameGaufrette(string $name)
         {
             $this->getConfigGaufrette();
-            return $this->filesystem->read($name);
+            if (isset($this->filesystem)) {
+                try {
+                    return $this->filesystem->read($name);
+                } catch (\Exception $e) {
+                    return null;
+                }
+            }
+            return null;
+  
+
 //            $k = $this->filesystem->get($name);
 //            return $this->filesystem->getadapter()->read($k);
         }
@@ -64,13 +73,16 @@
         {
             // get config gaufrette
             $this->getConfigGaufrette();
-            $this->filesBag   = $this->cacheManager->cache->get("KEYS", function (ItemInterface $item) {
-                $this->filesBag = $this->filesystem->listKeys("");
-                $item->expiresAfter(self::LIFETIME);
-                $item->set($this->filesBag);
-                return $this->filesBag;
-            });
-            $this->setVirtualSecretKeys();
+            if(isset($this->filesystem)){
+                $this->filesBag   = $this->cacheManager->cache->get("KEYS", function (ItemInterface $item) {
+                    $this->filesBag = $this->filesystem->listKeys("");
+                    $item->expiresAfter(self::LIFETIME);
+                    $item->set($this->filesBag);
+                    return $this->filesBag;
+                });
+                $this->setVirtualSecretKeys();
+            }
+
         }
 
         private function setVirtualSecretKeys()
@@ -93,22 +105,24 @@
         {
             $conf = $this->parameterBag->get('doctrine_encryptor.encryptor_storage');
             if (!$conf) {
-                throw new \Exception(
-                    'Configuration doctrine_encryptor.encryptor_storage not found. Check your config\\doctrine_encryptor.yml'
-                );
+                echo "Doctrine-encryptor-bundle : Warning x01 | run afert php bin/console neox:encryptor:install\n";//                throw new \Exception(
+//                    'Configuration doctrine_encryptor.encryptor_storage not found. Check your config\\doctrine_encryptor.yml'
+//                );
             }
             $adaptor          = explode(':', $conf)[ 1 ];
             if (!$adaptor) {
-                throw new \Exception(
-                    "No filesystem is registered for name $adaptor"
-                );
+                echo "Doctrine-encryptor-bundle : Warning x02 | run afert php bin/console neox:encryptor:install\n";
+//                throw new \Exception(
+//                    "No filesystem is registered for name $adaptor"
+//                );
             }
             try {
                 $this->filesystem = $this->fileSystemMap->get($adaptor);
             } catch (\Exception $e) {
-                throw new \Exception(
-                    "No filesystem is registered for name $adaptor. Check your gaufrette.yaml"
-                );
+                echo "Doctrine-encryptor-bundle : Warning x03 | run afert php bin/console neox:encryptor:install\n";
+//                throw new \Exception(
+//                    "No filesystem is registered for name $adaptor. Check your gaufrette.yaml"
+//                );
             }
             return $adaptor; // get go
         }

@@ -132,7 +132,7 @@
 
         private static function getNameKey(EncryptorInterface $t, string $key): ?HiddenString
         {
-            $o = $t->secureKey->getKeyName($key) ?? null;
+            $o = $t->secureKey->getKeyNameCache($key) ?? null;
             if ($o) {
                 return new HiddenString($o);
             }
@@ -141,6 +141,10 @@
 
         private static function getNameKeyGaufrette(EncryptorInterface $t, string $key): ?HiddenString
         {
-            return new HiddenString($t->secureKey->getKeyNameGaufrette($key));
+            $p = $t->secureKey->getKeyNameGaufrette($key);
+            if ($p) {
+                return new HiddenString($p);
+            }
+            return null;
         }
     }

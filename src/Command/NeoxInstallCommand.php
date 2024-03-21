@@ -1,11 +1,8 @@
 <?php
 
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Command;
-
-    use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\NeoxEncryptor;
-    use DoctrineEncryptor\DoctrineEncryptorBundle\Command\Helper\HelperCommand;
-    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLAlgo;
-    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLTools;
+    
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Resources\script\PostInstallScript;
     use ReflectionException;
     use Symfony\Component\Console\Attribute\AsCommand;
     use Symfony\Component\Console\Command\Command;
@@ -16,7 +13,8 @@
     use Symfony\Component\Console\Question\ChoiceQuestion;
     use Symfony\Component\Console\Style\SymfonyStyle;
     use Symfony\Component\Console\Input\ArrayInput;
-    
+    use Symfony\Component\Yaml\Yaml;
+
     #[AsCommand(name: 'neox:encryptor:install', description: 'Add a short description for your command',)]
     class NeoxInstallCommand extends Command
     {
@@ -24,11 +22,9 @@
         private const ALL    = "ALL";
 
         // XDEBUG_TRIGGER=1 php bin/console neox:encryptor:switch
-        public HelperCommand $helperCommand;
 
-        public function __construct(HelperCommand $helperCommand)
+        public function __construct()
         {
-            $this->helperCommand = $helperCommand;
             parent::__construct();
         }
 
@@ -53,41 +49,51 @@
             $listeAlgos[] = self::CANCEL;
             
             // Welcome
-            $io->text([
-                "Welcome to Doctrine Encryptor Bundle!", 
+            $io->info([
+                "Welcome to Doctrine Encryptor Bundle automique setup!", 
                 "We are going to check if your application have all requirements.",
                 "GaufretteBundle & caching system",
                 "Gaufrette is recommended to use Doctrine Encryptor to provide better security. in this configuration your key will be stored in external server.",
                 "On top of gaufrette we also recommended to use caching system to speed up your application.",
             ] );
-            $io->text([
-                "Gaufrettebundle need to at list minimal configuration to work. ",
-                "In config\\gaufrette.yml you need to specify : ",
-                'knp_gaufrette:',
-                '    adapters:',
-                '        local_adapter:',
-                '            local:',
-                "                directory: '%kernel.project_dir%/config/doctrine-encryptor/'",
-                '',
-                '    filesystems:',
-                '        local:',
-                '            adapter: local_adapter'
-            ] );
+//            $io->warning([
+//                "Gaufrettebundle need to at list minimal configuration to work. ",
+//                "In config\\gaufrette.yml you need to specify : ",
+//                'knp_gaufrette:',
+//                '    adapters:',
+//                '        foo_adapter:',
+//                '            local:',
+//                "                directory: '%kernel.project_dir%/config/doctrine-encryptor/'",
+//     
+//            ] );
 
-            $io->text([
-                "Caching system need to be install & working ",
-            ] );
-            
-            // 
-            
+//            $io->warning([
+//                "Caching system need to be install & working ",
+//            ] );
             $switchEncryptor = $this->askChoiceQuestion(
                 "Please choose ENCRYPTOR to switch to:",
-                $listEncryptor,
+                [self::CANCEL, "Setup auto"],
                 $input,
                 $output
             );
+            switch( $switchEncryptor ) {
+                case self::CANCEL:
+                    $io->success( 'Nothing has been changed.' );
+                    return Command::SUCCESS;
 
-            $io->success("Switch : has been processed. - You can now use neox:encryptor:wasaaaa to encrypt database.");
+                default:
+                    
+                    PostInstallScript::doctrineEncryptor(); // Switche
+                    PostInstallScript::gaufrette(); // Switche
+
+                    $io->success( "Setup [standart] is done." );
+                    
+                    
+                    break;
+            }
+//            $this->processOpenSSLKey($input, $output); // Switche>
+            //
+            $io->success("Now : you can create key openssl run : neox:encryptor:openssl ");
 
             return Command::SUCCESS;
         }
@@ -118,6 +124,14 @@
             $autreCommande->run($autreCommandeInput, $output);
         }
 
+        private function processOpenSSLKey(InputInterface $input, OutputInterface $output): void
+        {
+            $autreCommande          = $this->getApplication()->find('n:e:o');
+            $autreCommandeArguments = [];
+            $autreCommandeInput     = new ArrayInput($autreCommandeArguments);
+            $autreCommande->run($autreCommandeInput, $output);
+        }
+        
         private function cacheClear(InputInterface $input, OutputInterface $output): void
         {
             $autreCommande      = $this->getApplication()->find('c:c');
@@ -129,5 +143,21 @@
             ]);
 
             $autreCommande->run($autreCommandeInput, $output);
+        }
+
+        private  function recursiveMerge(array $source, array $target): array
+        {
+            foreach ($source as $key => $value) {
+                if (is_array($value) && isset($target[ $key ]) && is_array($target[ $key ])) {
+                    // Si la clé existe dans les deux configurations et que les deux valeurs sont des tableaux,
+                    // fusionner récursivement les sous-tableaux
+                    $target[ $key ] = self::recursiveMerge($value, $target[ $key ]);
+                } elseif (!isset($target[ $key ])) {
+                    // Si la clé n'existe pas déjà dans la configuration cible, l'ajouter
+                    $target[ $key ] = $value;
+                }
+            }
+
+            return $target;
         }
     }
