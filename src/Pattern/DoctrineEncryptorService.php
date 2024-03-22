@@ -11,6 +11,7 @@
     use ReflectionException;
     use ReflectionProperty;
     use Psr\Log\LoggerInterface;
+    use Monolog\Logger;
 
     class DoctrineEncryptorService
     {
@@ -125,8 +126,8 @@
                 $Reflection->getProperty()->setValue($entity, $process);
             }
 
-            $this->logger("enc", $entity, $Reflection);
-
+//            self::logger("enc", $this->logger, $this->encryptor, $entity, $Reflection->getAttributeProperty());
+            
             if ($items) {
                 $this->entityCurentState = $entity::class;
                 $neoxEncryptor?->setContent(json_encode($items, JSON_THROW_ON_ERROR | false, 512));
@@ -173,7 +174,7 @@
                 $Reflection->getProperty()->setValue($entity, $process);
             }
 
-            $this->logger("dec", $entity, $Reflection);
+//            self::logger("dec", $this->logger, $this->encryptor, $entity, $Reflection->getAttributeProperty());
         }
 
         /**
@@ -319,11 +320,17 @@
          * @return void
          * @throws ReflectionException
          */
-        private function logger($action, $entity, mixed $Reflection): void
+        public static function logger($action, LoggerInterface $logger, $encryptor = null, $entity = null, $arguments = null): void
         {
-            $className   = (new ReflectionClass($this->encryptor))->getShortName();
-            $entityClass = $entity::class;
-            $this->logger->info("$action : $className : $entityClass | " . $Reflection->getAttributeProperty());
+            $className   = $encryptor;
+            $entityClass = $entity;
+            if ($encryptor instanceof EncryptorInterface) {
+                $className = (new ReflectionClass($encryptor))->getShortName();
+            }
+            if ($entity) {
+                $entityClass = $entity::class;
+            }
+            $logger->info("$action : $className : $entityClass | " . $arguments);
         }
 
     }

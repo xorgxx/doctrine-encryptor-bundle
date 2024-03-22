@@ -5,6 +5,8 @@
     use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\NeoxEncryptor;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Command\Helper\HelperCommand;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\Halite\HaliteTools;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\DoctrineEncryptorService;
+    use Psr\Log\LoggerInterface;
     use ReflectionException;
     use Symfony\Component\Console\Attribute\AsCommand;
     use Symfony\Component\Console\Command\Command;
@@ -25,7 +27,7 @@
         // XDEBUG_TRIGGER=1 php bin/console neox:encryptor:openssl
         public HelperCommand $helperCommand;
 
-        public function __construct( HelperCommand $helperCommand )
+        public function __construct( HelperCommand $helperCommand, readonly LoggerInterface $logger)
         {
             $this->helperCommand = $helperCommand;
             parent::__construct();
@@ -50,11 +52,15 @@
                 "Decrypt before"
             ];
 
+            $CurrentEncryptor = $this->helperCommand->getCurrentEncryptor();
+            DoctrineEncryptorService::logger("Create halite key | current encyptor is  : " . $CurrentEncryptor, $this->logger);
+            
             // Ask user which entity should be moved.
             $io->warning( [
                 "Prior to initiating the process, ensure that all data in your database is encrypted.",
                 "We highly advise halting all traffic to your database and putting your website in maintenance mode."
             ]);
+      
             $question = new ChoiceQuestion( "", [self::CANCEL, "Continue, i know the risque"] );
             $question->setErrorMessage( 'ENTITY : %s does not exist.' );
             $algoOpen = $this->getHelper( 'question' )->ask( $input, $output, $question );
@@ -62,6 +68,7 @@
             switch( $algoOpen ) {
                 case self::CANCEL:
                     $io->success( 'Nothing has been changed.' );
+                    DoctrineEncryptorService::logger("Create halite key | User cancel!", $this->logger);
                     return Command::SUCCESS;
 
                 default:
@@ -83,11 +90,14 @@
 
             switch( $algoOpen ) {
                 case self::CANCEL:
+                    DoctrineEncryptorService::logger("Create halite key | User cancel!", $this->logger);
                     $io->success( 'Nothing has been changed.' );
                     return Command::SUCCESS;
                 case "Decrypt before":
+                    DoctrineEncryptorService::logger("Create halite key | Decrypt before ...", $this->logger);
                     $this->processEncryptor( $input, $output, "Decrypt" );
                 default:
+                    DoctrineEncryptorService::logger("Create halite key | starting build key ...", $this->logger);
                     $io->success( "You have chosen {$algoOpen}." );
                     break;
             }
@@ -95,7 +105,7 @@
             
             // process ascymetric encryption
             $r = HaliteTools::buildEncryptionKey($this->helperCommand->haliteEncryptor);
-
+            DoctrineEncryptorService::logger("Create halite key | Done build FINISH", $this->logger);
             $io->success( "Successfully build. check in folder that you setup in gaufrette.yaml" );
             
             return Command::SUCCESS;

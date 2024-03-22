@@ -38,5 +38,6 @@
             // Charge la configuration Monolog à partir du fichier monolog.yaml de votre bundle
             $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/setup/'));
             $loader->load('neox_encryptor.yaml');
+            $loader->load('gaufrette.yaml');
         }
 	}

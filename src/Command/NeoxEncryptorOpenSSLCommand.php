@@ -4,6 +4,7 @@
     
     use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\NeoxEncryptor;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Command\Helper\HelperCommand;
+    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\DoctrineEncryptorService;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLAlgo;
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL\OpenSSLTools;
     use ReflectionException;
@@ -16,6 +17,7 @@
     use Symfony\Component\Console\Output\OutputInterface;
     use Symfony\Component\Console\Question\ChoiceQuestion;
     use Symfony\Component\Console\Style\SymfonyStyle;
+    use Psr\Log\LoggerInterface;
     
     #[AsCommand(
         name: 'neox:encryptor:openssl',
@@ -29,7 +31,7 @@
         // XDEBUG_TRIGGER=1 php bin/console neox:encryptor:openssl
         public HelperCommand $helperCommand;
         
-        public function __construct(HelperCommand $helperCommand)
+        public function __construct(HelperCommand $helperCommand, readonly LoggerInterface $logger)
         {
             $this->helperCommand = $helperCommand;
             parent::__construct();
@@ -55,6 +57,9 @@
             $listeAlgos         = array_column(OpenSSLAlgo::getListe(), 'value');
             $listeAlgos[]       = self::CANCEL;
 
+            $CurrentEncryptor = $this->helperCommand->getCurrentEncryptor();
+            DoctrineEncryptorService::logger("Create OpenSSL-Symc key | current encyptor is  : " . $CurrentEncryptor, logger: $this->logger);
+
             $io->warning( [
                 "Prior to initiating the process, ensure that all data in your database is encrypted.",
                 "We highly advise halting all traffic to your database and putting your website in maintenance mode."
@@ -65,6 +70,7 @@
 
             switch( $algoOpen ) {
                 case self::CANCEL:
+                    DoctrineEncryptorService::logger("Create OpenSSL-Symc key | User cancel!", logger: $this->logger);
                     $io->success( 'Nothing has been changed.' );
                     return Command::SUCCESS;
 
@@ -86,11 +92,14 @@
 
             switch( $algoOpen ) {
                 case self::CANCEL:
+                    DoctrineEncryptorService::logger("Create OpenSSL-Symc key | User cancel!", logger: $this->logger);
                     $io->success( 'Nothing has been changed.' );
                     return Command::SUCCESS;
                 case "Decrypt before":
+                    DoctrineEncryptorService::logger("Create OpenSSL-Symc key | Decrypt before ...", logger: $this->logger);
                     $this->processEncryptor( $input, $output, "Decrypt" );
                 default:
+                    DoctrineEncryptorService::logger("Create OpenSSL-Symc key |  starting build key ...", logger: $this->logger);
                     $io->success( "You have chosen {$algoOpen}." );
                     break;
             }
@@ -104,6 +113,7 @@
             
             switch ($algoOpen) {
                 case self::CANCEL:
+                    DoctrineEncryptorService::logger("Create OpenSSL-Symc key | User cancel!", logger: $this->logger);
                     $io->success('Nothing has been changed.');
                     return Command::SUCCESS;
                     
@@ -115,26 +125,28 @@
                     $io->success("You have chosen {$algoOpen}.");
                     break;
             }
-
+            DoctrineEncryptorService::logger("Create OpenSSL-Symc key | algo : {$algoOpen} ", logger: $this->logger);
             $KeyLengths[]   = self::CANCEL;
 
             $io->newLine();
             // ask which action user wants to doo ?
             $question       = new ChoiceQuestion("Select Key Length (bits): ", $KeyLengths );
             $KeyLengths     = $this->getHelper('question')->ask($input, $output, $question);
-            
+            DoctrineEncryptorService::logger("Create OpenSSL-Symc key |  starting build key ...");
             switch ($KeyLengths) {
                 case self::CANCEL:
+                    DoctrineEncryptorService::logger("Create OpenSSL-Symc key | User cancel!", logger: $this->logger);
                     $io->success('Nothing has been changed.');
                     return Command::SUCCESS;
                 default:
+                    DoctrineEncryptorService::logger("Create OpenSSL-Symc key | starting build key ...", logger: $this->logger);
                     $io->success("You have chosen {$algoOpen} - {$KeyLengths}.");
                     break;
             }
             
             // process ascymetric encryption
             $r = OpenSSLTools::buildOpenSSLKey($this->helperCommand->openSSLSymEncryptor, $algoOpen, $KeyLengths);
-            
+            DoctrineEncryptorService::logger("Create OpenSSL-Symc key | Done build FINISH", logger: $this->logger);
 //            $this->processHaliteKey($input, $output);
 
             $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
