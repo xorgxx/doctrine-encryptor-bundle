@@ -53,7 +53,7 @@
             ];
 
             $CurrentEncryptor = $this->helperCommand->getCurrentEncryptor();
-            DoctrineEncryptorService::logger("Create halite key | current encyptor is  : " . $CurrentEncryptor, $this->logger);
+            DoctrineEncryptorService::logger("Create halite key |--- current encyptor is  : " . $CurrentEncryptor, $this->logger);
             
             // Ask user which entity should be moved.
             $io->warning( [
@@ -68,7 +68,7 @@
             switch( $algoOpen ) {
                 case self::CANCEL:
                     $io->success( 'Nothing has been changed.' );
-                    DoctrineEncryptorService::logger("Create halite key | User cancel!", $this->logger);
+                    DoctrineEncryptorService::logger("Create halite key |--- User cancel!", $this->logger);
                     return Command::SUCCESS;
 
                 default:
@@ -90,7 +90,7 @@
 
             switch( $algoOpen ) {
                 case self::CANCEL:
-                    DoctrineEncryptorService::logger("Create halite key | User cancel!", $this->logger);
+                    DoctrineEncryptorService::logger("Create halite key |--- User cancel!", $this->logger);
                     $io->success( 'Nothing has been changed.' );
                     return Command::SUCCESS;
                 case "Decrypt before":
@@ -105,7 +105,7 @@
             
             // process ascymetric encryption
             $r = HaliteTools::buildEncryptionKey($this->helperCommand->haliteEncryptor);
-            DoctrineEncryptorService::logger("Create halite key | Done build FINISH", $this->logger);
+            DoctrineEncryptorService::logger("Create halite key |--- Done build FINISH", $this->logger);
             $io->success( "Successfully build. check in folder that you setup in gaufrette.yaml" );
             
             return Command::SUCCESS;
