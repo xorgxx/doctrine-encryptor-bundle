@@ -2,6 +2,7 @@
 
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Pattern;
 
+    use Psr\Cache\InvalidArgumentException;
     use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
     use Gaufrette\Filesystem;
     use Knp\Bundle\GaufretteBundle\FilesystemMap;
@@ -11,7 +12,7 @@
 
     class SecureKey
     {
-        const LIFETIME = 7200;
+        public const LIFETIME = 7200;
         public Filesystem $filesystem;
         public array      $filesBag;
 
@@ -24,7 +25,7 @@
             $this->initialize();
         }
 
-        public function setKeyName(string $name, string $content)
+        public function setKeyName(string $name, string $content): bool|int
         {
             
             $adaptator = $this->getConfigGaufrette();
@@ -41,7 +42,7 @@
             return null;
         }
 
-        public function getKeyNameGaufrette(string $name)
+        public function getKeyNameGaufrette(string $name): bool|string|null
         {
             $this->getConfigGaufrette();
             if (isset($this->filesystem)) {
@@ -58,7 +59,11 @@
 //            return $this->filesystem->getadapter()->read($k);
         }
 
-        public function resteAllKey(string $filter)
+        /**
+         * @throws InvalidArgumentException
+         * @throws \ReflectionException
+         */
+        public function resteAllKey(string $filter): void
         {
             $this->filesystem = $this->fileSystemMap->get('neox');
             $this->filesBag   = $this->filesystem->listKeys("");
@@ -75,7 +80,7 @@
             }
         }
 
-        private function initialize()
+        private function initialize(): void
         {
             // get config gaufrette
             $this->getConfigGaufrette();
@@ -91,7 +96,7 @@
 
         }
 
-        private function setVirtualSecretKeys()
+        private function setVirtualSecretKeys(): void
         {
             foreach ($this->filesBag[ "keys" ] as $k => $v) {
                 $this->cacheManager->cache->get($v, function (ItemInterface $item) use ($k, $v) {
