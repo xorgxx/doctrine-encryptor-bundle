@@ -66,7 +66,10 @@
 
             foreach ($this->filesBag[ "keys" ] as $k => $v) {
                 // Check if the file name matches your filter criteria
-                DoctrineEncryptorService::logger("Delete key : " . $v, $this->logger);
+                DoctrineEncryptorService::logger("--- Delete key : CONTENT---" . $v, $this->logger);
+                $k = $this->filesystem->getAdapter()->read($v);
+                DoctrineEncryptorService::logger("" . $k, $this->logger);
+                DoctrineEncryptorService::logger("-------" . $v, $this->logger);
                 $this->filesystem->getAdapter()->delete($v);
                 $this->cacheManager->cache->delete($v);
             }
