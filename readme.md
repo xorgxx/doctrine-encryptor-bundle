@@ -87,11 +87,9 @@ config/gaufrette.yaml
 
 * [Cipher Algorithm list](doc/cipherAlgorithm.md)
 * [Encryptor list](doc/encryptor)
+* [Logs & reversing](doc/logger)
 
-
-
-
-**because it's not realise yet, before making update bundle, we recommende to decrypt all your sandbox data**
+**because it'd not realised yet, before making update bundle, we recommend decrypting all your sandbox data**
 
 ## Usage !
 In entity, you want to secure field (data) 

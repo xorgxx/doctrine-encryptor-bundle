@@ -7,6 +7,7 @@
     use Knp\Bundle\GaufretteBundle\FilesystemMap;
     use Psr\Cache\CacheItemPoolInterface;
     use Symfony\Contracts\Cache\ItemInterface;
+    use Psr\Log\LoggerInterface;
 
     class SecureKey
     {
@@ -17,7 +18,8 @@
         public function __construct(
             readonly ParameterBagInterface $parameterBag,
             readonly FilesystemMap $fileSystemMap,
-            readonly CacheManagerService $cacheManager
+            readonly CacheManagerService $cacheManager,
+            readonly LoggerInterface $logger
         ) {
             $this->initialize();
         }
@@ -64,6 +66,7 @@
 
             foreach ($this->filesBag[ "keys" ] as $k => $v) {
                 // Check if the file name matches your filter criteria
+                DoctrineEncryptorService::logger("Delete key : " . $v, $this->logger);
                 $this->filesystem->getAdapter()->delete($v);
                 $this->cacheManager->cache->delete($v);
             }
