@@ -86,8 +86,8 @@ config/gaufrette.yaml
     **/
 
 * [Cipher Algorithm list](doc/cipherAlgorithm.md)
-* [Encryptor list](doc/encryptor)
-* [Logs & reversing](doc/logger)
+* [Encryptor list](doc/encryptor.md)
+* [Logs & reversing](doc/logger.md)
 
 **because it'd not realised yet, before making update bundle, we recommend decrypting all your sandbox data**
 
