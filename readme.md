@@ -14,20 +14,13 @@ PSR-12
 
 [![Doctrineencryptor-schema.png](https://i.postimg.cc/NG408N8j/Doctrineencryptor-schema.png)](https://postimg.cc/0rzxP0HT)
 
-## Installation DEV-MASTER VERSION is not stable yet ! to use as sandBox !!
+## Installation RELEASE ! 
 
-Install the bundle for Composer !! as is still on a beta version !!
+Install the bundle for Composer
 
 ````
-  composer require xorgxx/doctrine-encryptor-bundle
-  or 
-  composer require xorgxx/doctrine-encryptor-bundle:0.* or dev-master
+  composer require xorgxx/doctrine-encryptor-bundle:^0.1 or dev-master
 ````
-🚨 Add in your project this bundles. 🚨
-````
-  composer require paragonie/halite
-````
-
 
 ## Doctrine migrations
 🚨 You will have to make migration to add NeoxEncryptor in your entities. 🚨
@@ -43,7 +36,9 @@ Install the bundle for Composer !! as is still on a beta version !!
 
 **NOTE:** _You may need to use [ symfony composer dump-autoload ] to reload autoload_
 
+
 ## ..... Done 🎈
+
 
 ## Config file
 doctrine_encryptor.yaml file
@@ -57,14 +52,15 @@ doctrine_encryptor.yaml file
     encryptor_storage: 'gaufrette:local' # name of filesystems in you config/gaufrette.yaml
     encryptor_cache: false # use true for ussing cache system. you will have to setup your application before  
 ````
-To setup your cache system [symfony cache](https://symfony.com/doc/current/components/cache.html)
+
+We recommended setting up your cache system [symfony cache](https://symfony.com/doc/current/components/cache.html)
 
 ## More security getting key form external store
 🚨 We use  [KnpGaufrette](https://github.com/KnpLabs/KnpGaufretteBundle) .
 In this setup, all keys are stored externally and are not accessible from within your website. This means that even if
 someone gains access to your code, they won't be able to access the keys, providing an additional layer of security for
 your encryption system.
-In order you have to configure at liste one "adapter":
+In order, you have to configure at liste one "adapter":
 config/gaufrette.yaml
 ````
   knp_gaufrette:
@@ -89,10 +85,8 @@ config/gaufrette.yaml
 * [Encryptor list](doc/encryptor.md)
 * [Logs & reversing](doc/logger.md)
 
-**because it'd not realised yet, before making update bundle, we recommend decrypting all your sandbox data**
-
 ## Usage !
-In entity, you want to secure field (data) 
+In entity, you want to secure field (data) in Entity
 ````php
 
   use DoctrineEncryptor\DoctrineEncryptorBundle\Attribute\NeoxEncryptor;
@@ -144,9 +138,10 @@ Then is Entity file add attribute [facker: PhoneFacker::class]
 
 ## TWIG 
 To manage on template twig to decrypt field
-````
+```
+  # first put entity and the field name to decrypt`
   {{ health.profile | doctrineDecrypt("firstName") }}
-  first put entity and the field name to decrypt
+  
 ````
 
 ## Important !
@@ -157,11 +152,12 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
   #[ORM\Column(length: 20)]
   private ?string $name = null;
   
-  "john doe" <- decrypt (length:8)  / (length: +20!!) encrypt -> "MUIFAOpLp21iX1Dy2ZNkYbby6zo7ADYgVs-hGkNaWR2OF5AbQUMcBKZHigtFVxZiIFWyOTV8Ts-9q_pNAHBxCKcAPZNJjfPgVQglMLAKi0bZicmPlCQKJpRpX2k5IAjAqawOlFsPpD9KikIEFRhuy"
+  "john doe" <- decrypt (length:8) ✅  / ⛔ (length: +20!!) encrypt -> "MUIFAOpLp21iX1Dy2ZNkYbby6zo7ADYgVs-hGkNaWR2OF5AbQUMcBKZHigtFVxZiIFWyOTV8Ts-9q_pNAHBxCKcAPZNJjfPgVQglMLAKi0bZicmPlCQKJpRpX2k5IAjAqawOlFsPpD9KikIEFRhuy"
   
 ````
 ## Beware !!
   * **NO possibility to make index or search on field encrypted**
+
 ## 🚨 🚨 Danger 🚨🚨
 **!!! Before you change anything key, attribute "in"/"out" ... !!!**
 1. Decrypt all before
