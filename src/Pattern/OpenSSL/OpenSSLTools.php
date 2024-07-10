@@ -2,9 +2,10 @@
 
     namespace DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSL;
 
-    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\DoctrineEncryptorService;
+//    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\DoctrineEncryptorService;
+//    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSLSymEncryptor;
+
     use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\EncryptorInterface;
-    use DoctrineEncryptor\DoctrineEncryptorBundle\Pattern\OpenSSLSymEncryptor;
     use ParagonIE\Halite\Halite;
     use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -14,10 +15,12 @@
         public const PUBLIC_KEY  = 'openSSL_public.pem';
         public const PASS_KEY    = 'openSSL.key';
         public const ENCRYPT_BIN = 'openSSL.bin';
-        public const PATH_FOLDER = '/config/doctrine-encryptor/';
-        const        PREFIX      = 'doctrine_encryptor.encryptor_';
-        private string        $SecretBin;
-        private static string $SECRET;
+
+        // !!! deprecated !!!
+//        public const PATH_FOLDER = '/config/doctrine-encryptor/';
+//        const        PREFIX      = 'doctrine_encryptor.encryptor_';
+//        private string        $SecretBin;
+//        private static string $SECRET;
 
 
         public function __construct(readonly ParameterBagInterface $parameterBag)
@@ -26,9 +29,9 @@
 
         public static function buildOpenSSLKey(EncryptorInterface $t, string $algoOpen, string $KeyLengths): void
         {
-            // RESTE all key ======== !!!
+            // REST all key ======== !!!
             $t->secureKey->resteAllKey("openSSL");
-            // RESTE all key ======== !!!
+            // REST all key ======== !!!
 
 
             // generate encryptBin
@@ -55,12 +58,12 @@
             if ($keypair === false) {
                 throw new \RuntimeException("Failed to generate key pair.");
             }
-            //            $keypass
+            // $keypass
             openssl_pkey_export($keypair, $private_key);
             $key_details = openssl_pkey_get_details($keypair);
             $public_key  = $key_details[ 'key' ];
 
-            // generate encryptBin Asymc
+            // generate encryptBin Async
             openssl_public_encrypt($keyEncryptBin, $encryptedAESKey, $public_key);
 
             if (self::setNameKey($t, self::ENCRYPT_BIN, $encryptedAESKey) === false) {
@@ -115,7 +118,7 @@
 //            return false;
 //        }
 
-        public static function builderIndice($entity, $sercretBin = null): string
+        public static function builderIndice(object $entity, string $sercretBin ): string
         {
             // Delete the namespace 'Proxies\__CG__\'
             $className = str_replace('Proxies\__CG__\\', '', $entity::class);
@@ -161,6 +164,7 @@
                 ) === $string; // La chaîne n'est pas encodée en Base64
         }
 
+        // !!! depreciated !!!! | Keeping for not breaking | Todo check for not breaking
         public static function isSerialized($data)
         {
             $unserializedData = @unserialize($data);

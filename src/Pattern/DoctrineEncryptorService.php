@@ -38,17 +38,25 @@
          */
         public static function isSupport(string $className): bool
         {
-            $filename = (new ReflectionClass($className))->getFileName();
+            try {
+                $reflectionClass    = new ReflectionClass($className);
+                $filename           = $reflectionClass->getFileName();
+            } catch (ReflectionException $e) {
+                return false; // Unable to reflect on the class, return false
+            }
 
-            // to not provide of NeoxEncryptorEntity
-            if ($filename instanceof NeoxEncryptorEntity) {
-                return false;
+            if ($filename === false) {
+                return false; // Unable to get the filename, return false
             }
 
             $fileContent = file_get_contents($filename);
 
-            // Search for neoxEncryptor in file contents, ignoring comments
+            if ($fileContent === false) {
+                return false; // Unable to read file content, return false
+            }
+
             $cleanContent = preg_replace('/\/\*.*?\*\/|\/\/.*?[\r\n]/s', '', $fileContent);
+
             return str_contains($cleanContent, NeoxEncryptor::class);
         }
 
@@ -127,7 +135,7 @@
             }
 
 //            self::logger("enc", $this->logger, $this->encryptor, $entity, $Reflection->getAttributeProperty());
-            
+
             if ($items) {
                 $this->entityCurentState = $entity::class;
                 $neoxEncryptor?->setContent(json_encode($items, JSON_THROW_ON_ERROR | false, 512));
