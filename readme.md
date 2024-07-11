@@ -166,10 +166,29 @@ Consider the size / length of field you want to crypt when you chose "in" !! ex:
 
 
 ## [CLI] Command build-in
-  * `php bin/console neox:encryptor:wasaaaa` // command line to crypt/decrypt
-  * `php bin/console neox:encryptor:openssl` // command to create .pem & .key
-  * `php bin/console neox:encryptor:halite`  // command to create .pem & .key
-  * `php bin/console neox:encryptor:switch`  // command to switch to new encryptor: ex: halite to openSSLSym
+
+
+To switch between encryptors:
+
+
+  **First**:
+  - `php bin/console neox:encryptor:switch` (command to switch to the new encryptor, e.g., from halite to openSSLSym)
+####  For exemple | php bin/console neox:encryptor:switch | Process automatique will do this : ex: halite to openSSLSym
+  * Decrypt all with the current encryptor halite
+  * Modify in doctrine_encryptor.yaml |-> encryptor_system: halite >>> openSSLSym
+  * Clear the cache
+#### !!! This process was added to prevent any data loss during the change or renewal of SSL keys.
+
+  **THEN you will need to creat manually new ssl key**:
+  - `php bin/console neox:encryptor:openssl` (command to create .pem & .key)
+  
+  **OR**
+  
+  - `php bin/console neox:encryptor:halite` (command to create .pem & .key)
+
+  **FINALLY, to encrypt / decrypt data**:
+  - `php bin/console neox:encryptor:wasaaaa`
+
   * ~~php bin/console neox:encryptor:renew   // command to change all .pem & .key files. mainly to change cryptage.~~
 
 ####  For exemple | php bin/console neox:encryptor:switch | Process automatique will do this : ex: halite to openSSLSym
