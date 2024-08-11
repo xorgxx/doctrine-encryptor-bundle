@@ -14,6 +14,8 @@ PSR-12
 
 [![Doctrineencryptor-schema.png](https://i.postimg.cc/NG408N8j/Doctrineencryptor-schema.png)](https://postimg.cc/0rzxP0HT)
 
+[![cryptor.png](https://i.postimg.cc/FKQ9NqBX/cryptor.png)](https://postimg.cc/sMwFJnzT)
+
 ## Installation RELEASE ! 
 
 Install the bundle for Composer
